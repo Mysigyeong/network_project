@@ -46,120 +46,58 @@ UnoServer::GetTypeId (void)
     .AddAttribute ("ClientAddress1", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[0])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress1),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress2", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[1])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress2),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress3", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[2])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress3),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress4", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[3])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress4),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress5", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[4])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress5),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress6", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[5])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress6),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress7", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[6])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress7),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress8", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[7])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress8),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress9", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[8])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress9),
                    MakeAddressChecker ())
     .AddAttribute ("ClientAddress10", 
                    "The destination Address of the outbound packets",
                    AddressValue (),
-                   MakeAddressAccessor (&(UnoServer::m_clientAddress[9])),
+                   MakeAddressAccessor (&UnoServer::m_clientAddress10),
                    MakeAddressChecker ())
-    .AddAttribute ("ClientPort1", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[0])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort2", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[1])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort3", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[2])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort4", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[3])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort5", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[4])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort6", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[5])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort7", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[6])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort8", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[7])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort9", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[8])),
-                   MakeUintegerChecker<uint16_t> ())
-    .AddAttribute ("ClientPort10", 
-                   "The destination port of the outbound packets",
-                   UintegerValue (),
-                   MakeUintegerAccessor (&(UnoServer::m_clientPort[9])),
-                   MakeUintegerChecker<uint16_t> ())
     .AddAttribute ("NumberOfClient",
                    "The number of clients",
                    UintegerValue (0),
                    MakeUintegerAccessor (&UnoServer::m_numOfSocket),
                    MakeUintegerChecker<uint32_t> ())
-    .AddTraceSource ("Tx", "A new packet is created and is sent",
-                     MakeTraceSourceAccessor (&UnoServer::m_txTrace),
-                     "ns3::Packet::TracedCallback")
-    .AddTraceSource ("Rx", "A packet has been received",
-                     MakeTraceSourceAccessor (&UnoServer::m_rxTrace),
-                     "ns3::Packet::TracedCallback")
-    .AddTraceSource ("TxWithAddresses", "A new packet is created and is sent",
-                     MakeTraceSourceAccessor (&UnoServer::m_txTraceWithAddresses),
-                     "ns3::Packet::TwoAddressTracedCallback")
-    .AddTraceSource ("RxWithAddresses", "A packet has been received",
-                     MakeTraceSourceAccessor (&UnoServer::m_rxTraceWithAddresses),
-                     "ns3::Packet::TwoAddressTracedCallback")
   ;
   return tid;
 }
@@ -198,15 +136,7 @@ UnoServer::PrepareSocket (uint32_t idx)
     {
         TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
         m_socket[idx] = Socket::CreateSocket (GetNode (), tid);
-        if (Ipv4Address::IsMatchingType(m_clientAddress[idx]) == true)
-        {
-            if (m_socket[idx]->Bind () == -1)
-            {
-                NS_FATAL_ERROR ("Failed to bind socket");
-            }
-            m_socket[idx]->Connect (InetSocketAddress (Ipv4Address::ConvertFrom(m_clientAddress[idx]), m_clientPort[idx]));
-        }
-        else if (InetSocketAddress::IsMatchingType (m_clientAddress[idx]) == true)
+        if (InetSocketAddress::IsMatchingType (m_clientAddress[idx]) == true)
         {
             if (m_socket[idx]->Bind () == -1)
             {
@@ -229,11 +159,20 @@ UnoServer::StartApplication (void)
 {
     NS_LOG_FUNCTION (this);
 
+    m_clientAddress[0] = m_clientAddress1;
+    m_clientAddress[1] = m_clientAddress2;
+    m_clientAddress[2] = m_clientAddress3;
+    m_clientAddress[3] = m_clientAddress4;
+    m_clientAddress[4] = m_clientAddress5;
+    m_clientAddress[5] = m_clientAddress6;
+    m_clientAddress[6] = m_clientAddress7;
+    m_clientAddress[7] = m_clientAddress8;
+    m_clientAddress[8] = m_clientAddress9;
+    m_clientAddress[9] = m_clientAddress10;
+
     for (uint32_t i = 0; i < m_numOfSocket; i++) {
         PrepareSocket(i);
     }
-
-    
 
     m_sendEvent = Simulator::Schedule (Seconds(0.), &UnoServer::Send, this, 0);
 }
@@ -271,33 +210,23 @@ UnoServer::Send (uint32_t clientIdx)
 
     // Setting unoPacket
     
-    p = Create<Packet> (static_cast<uint8_t*>&unoPacket, sizeof(unoPacket));
+    p = Create<Packet> (reinterpret_cast<uint8_t*>(&unoPacket), sizeof(unoPacket));
   
     //-------------------------------------------
 
     Address localAddress;
     m_socket[clientIdx]->GetSockName (localAddress);
-    // call to the trace sinks before the packet is actually sent,
-    // so that tags added to the packet can be sent as well
-    m_txTrace (p);
-    if (Ipv4Address::IsMatchingType (m_clientAddress[clientIdx]))
-    {
-        m_txTraceWithAddresses (p, localAddress, InetSocketAddress (Ipv4Address::ConvertFrom (m_clientAddress[clientIdx]), m_clientPort[clientIdx]));
-    }
+    
     m_socket[clientIdx]->Send (p);
 
-    if (Ipv4Address::IsMatchingType (m_clientAddress[clientIdx]))
+    if (InetSocketAddress::IsMatchingType (m_clientAddress[clientIdx]))
     {
-        NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client sent " << m_size << " bytes to " <<
-                   Ipv4Address::ConvertFrom (m_clientAddress[clientIdx]) << " port " << m_clientPort[clientIdx]);
-    }
-    else if (InetSocketAddress::IsMatchingType (m_clientAddress[clientIdx]))
-    {
-        NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client sent " << m_size << " bytes to " <<
-                   InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetIpv4 () << " port " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetPort ());
+        NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server sent " << sizeof(unoPacket) << " bytes to client "
+                     << clientIdx + 1 << " " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetIpv4 ()
+                     << " port " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetPort ());
     }
 
-    m_sendEvent = Simulator::Schedule (Seconds(0.), &UnoServer::Send, this);
+    m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx + 1) % m_numOfSocket);
 }
 
 void
@@ -311,13 +240,11 @@ UnoServer::HandleRead (Ptr<Socket> socket)
     {
       if (InetSocketAddress::IsMatchingType (from))
         {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client received " << packet->GetSize () << " bytes from " <<
+          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server received " << packet->GetSize () << " bytes from " <<
                        InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
                        InetSocketAddress::ConvertFrom (from).GetPort ());
         }
       socket->GetSockName (localAddress);
-      m_rxTrace (packet);
-      m_rxTraceWithAddresses (packet, from, localAddress);
     }
 }
 

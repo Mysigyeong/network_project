@@ -77,22 +77,20 @@ private:
 
   uint32_t m_numOfSocket; //!< Number of socket ; max 10
   Ptr<Socket> m_socket[10]; //!< Socket
+
   Address m_clientAddress[10]; //!< Remote peer address
-  uint16_t m_clientPort[10]; //!< Remote peer port
+  Address m_clientAddress1;
+  Address m_clientAddress2;
+  Address m_clientAddress3;
+  Address m_clientAddress4;
+  Address m_clientAddress5;
+  Address m_clientAddress6;
+  Address m_clientAddress7;
+  Address m_clientAddress8;
+  Address m_clientAddress9;
+  Address m_clientAddress10;
+  
   EventId m_sendEvent; //!< Event to send the next packet
-
-  /// Callbacks for tracing the packet Tx events
-  TracedCallback<Ptr<const Packet> > m_txTrace;
-
-  /// Callbacks for tracing the packet Rx events
-  TracedCallback<Ptr<const Packet> > m_rxTrace;
-  
-  /// Callbacks for tracing the packet Tx events, includes source and destination addresses
-  TracedCallback<Ptr<const Packet>, const Address &, const Address &> m_txTraceWithAddresses;
-  
-  /// Callbacks for tracing the packet Rx events, includes source and destination addresses
-  TracedCallback<Ptr<const Packet>, const Address &, const Address &> m_rxTraceWithAddresses;
-
 };
 
 } // namespace ns3

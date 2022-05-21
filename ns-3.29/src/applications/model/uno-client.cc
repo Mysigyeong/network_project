@@ -49,12 +49,6 @@ UnoClient::GetTypeId (void)
                    UintegerValue (9),
                    MakeUintegerAccessor (&UnoClient::m_port),
                    MakeUintegerChecker<uint16_t> ())
-    .AddTraceSource ("Rx", "A packet has been received",
-                     MakeTraceSourceAccessor (&UnoClient::m_rxTrace),
-                     "ns3::Packet::TracedCallback")
-    .AddTraceSource ("RxWithAddresses", "A packet has been received",
-                     MakeTraceSourceAccessor (&UnoClient::m_rxTraceWithAddresses),
-                     "ns3::Packet::TwoAddressTracedCallback")
   ;
   return tid;
 }
@@ -132,11 +126,9 @@ UnoClient::HandleRead (Ptr<Socket> socket)
   while ((packet = socket->RecvFrom (from)))
     {
       socket->GetSockName (localAddress);
-      m_rxTrace (packet);
-      m_rxTraceWithAddresses (packet, from, localAddress);
       if (InetSocketAddress::IsMatchingType (from))
         {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server received " << packet->GetSize () << " bytes from " <<
+          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client received " << packet->GetSize () << " bytes from " <<
                        InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
                        InetSocketAddress::ConvertFrom (from).GetPort ());
         }
@@ -149,7 +141,7 @@ UnoClient::HandleRead (Ptr<Socket> socket)
 
       if (InetSocketAddress::IsMatchingType (from))
         {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server sent " << packet->GetSize () << " bytes to " <<
+          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client sent " << packet->GetSize () << " bytes to " <<
                        InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
                        InetSocketAddress::ConvertFrom (from).GetPort ());
         }

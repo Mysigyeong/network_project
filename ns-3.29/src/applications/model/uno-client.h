@@ -74,12 +74,6 @@ private:
   uint16_t m_port; //!< Port on which we listen for incoming packets.
   Ptr<Socket> m_socket; //!< IPv4 Socket
   Address m_local; //!< local multicast address
-
-  /// Callbacks for tracing the packet Rx events
-  TracedCallback<Ptr<const Packet> > m_rxTrace;
-
-  /// Callbacks for tracing the packet Rx events, includes source and destination addresses
-  TracedCallback<Ptr<const Packet>, const Address &, const Address &> m_rxTraceWithAddresses;
 };
 
 } // namespace ns3

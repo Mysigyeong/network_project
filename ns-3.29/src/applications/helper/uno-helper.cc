@@ -73,18 +73,13 @@ UnoClientHelper::InstallPriv (Ptr<Node> node) const
   return app;
 }
 
-UnoServerHelper::UnoServerHelper (uint32_t num, Address* addressList, uint16_t* portList)
+UnoServerHelper::UnoServerHelper (uint32_t num, Address* addressList)
 {
     const std::string addressAttributes[10] = { "ClientAddress1", "ClientAddress2",
                                                 "ClientAddress3", "ClientAddress4",
                                                 "ClientAddress5", "ClientAddress6",
                                                 "ClientAddress7", "ClientAddress8",
                                                 "ClientAddress9", "ClientAddress10" };
-    const std::string portAttributes[10] = { "ClientPort1", "ClientPort2",
-                                             "ClientPort3", "ClientPort4",
-                                             "ClientPort5", "ClientPort6",
-                                             "ClientPort7", "ClientPort8",
-                                             "ClientPort9", "ClientPort10" };
     if (num < 2 || num > 10) {
         NS_FATAL_ERROR("Invalid number of client");
     }
@@ -94,7 +89,6 @@ UnoServerHelper::UnoServerHelper (uint32_t num, Address* addressList, uint16_t* 
 
     for (uint32_t i = 0; i < num; i++) {
         SetAttribute (addressAttributes[i], AddressValue (addressList[i]));
-        SetAttribute (portAttributes[i], UintegerValue (portList[i]));
     }
 }
 

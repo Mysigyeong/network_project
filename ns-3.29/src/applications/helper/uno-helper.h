@@ -106,7 +106,7 @@ private:
 class UnoServerHelper
 {
 public:
-  UnoServerHelper (uint32_t num, Address* addressList, uint16_t* portList);
+  UnoServerHelper (uint32_t num, Address* addressList);
 
   /**
    * Record an attribute to be set in each Application after it is is created.
