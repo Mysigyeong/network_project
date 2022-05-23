@@ -36,6 +36,7 @@ NS_LOG_COMPONENT_DEFINE ("UnoServerApplication");
 
 NS_OBJECT_ENSURE_REGISTERED (UnoServer);
 
+
 TypeId
 UnoServer::GetTypeId (void)
 {
