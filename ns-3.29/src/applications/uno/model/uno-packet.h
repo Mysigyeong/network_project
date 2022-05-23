@@ -1,6 +1,7 @@
 #ifndef UNO_PACKET_H
 #define UNO_PACKET_H
 
+#include "uno-card.h"
 enum class GameOp : uint32_t
 {
     INIT,     // Game initialization.
@@ -17,19 +18,6 @@ enum class UserOp : uint32_t
     UNO       // Say uno
 };
 
-enum class Color : uint32_t
-{
-    BLUE,
-    GREEN,
-    RED,
-    YELLOW
-};
-
-struct Card
-{
-    Color color;
-    uint32_t num;
-};
 
 struct UnoPacket
 {
@@ -41,8 +29,8 @@ struct UnoPacket
 
     // Please add any fields if you need.
     uint32_t numOfCards;  // Number of cards in the packet
-    Card cards[10];       // List of cards
-    Color color;          // Selected color; used for wildcard
+    card cards[10];       // List of cards
+    uint32_t color;          // Selected color; used for wildcard
 };
 
 #endif
