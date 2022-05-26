@@ -25,6 +25,7 @@ Uno::Uno()
     playing=0;
     player_No=0;
 
+
     for(uint32_t i=1; i<5; i++)
     {
         //색상 선택
@@ -113,9 +114,6 @@ void Uno::Collect_Trash(card c)
     trash_deck.push_back(c);
 }
 
-
-
-
 void Uno::Trash2Deck()
 {
     deck.clear();
@@ -123,4 +121,27 @@ void Uno::Trash2Deck()
     Shuffle();
     trash_deck.clear();
 }
+
+/*uint32_t main()
+{
+    Uno uno;
+    for(uint32_t i=0; i<10; i++)
+    {
+        card c;
+        c.color = i%5;
+        c.number = i;
+        uno.Collect_Trash(c);
+    }
+    uno.Trash2Deck();
+    for(uint32_t i=0; i<uno.deck.size(); i++)
+    {
+        cout<<"color:   "<<uno.deck.at(i).color<<endl;
+        cout<<"number:   "<<uno.deck.at(i).number<<endl;
+        cout<<""<<endl;
+    }
+
+    cout<<"size: "<<uno.trash_deck.size()<<endl;
+    return 0;
+}*/
+
 

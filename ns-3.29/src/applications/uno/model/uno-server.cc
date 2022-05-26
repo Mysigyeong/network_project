@@ -43,6 +43,7 @@ uint32_t ready_player;
 
 long long seq_num;
 
+
 TypeId
 UnoServer::GetTypeId (void)
 {
@@ -160,6 +161,7 @@ UnoServer::PrepareSocket (uint32_t idx)
     m_socket[idx]->SetRecvCallback (MakeCallback (&UnoServer::HandleRead, this));
     m_socket[idx]->SetAllowBroadcast (true);
 }
+
 void 
 UnoServer::StartApplication (void)
 {
@@ -216,7 +218,6 @@ UnoServer::Send (uint32_t clientIdx)
     UnoPacket unoPacket;
 
     // Setting unoPacket
-
     p = Create<Packet> (reinterpret_cast<uint8_t*>(&unoPacket), sizeof(unoPacket));
   
     //-------------------------------------------

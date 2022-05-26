@@ -45,8 +45,6 @@ class Uno{
     vector <card> deck;
     vector <card> trash_deck;
     
-
-
     public:
     Uno();
     void Shuffle();
