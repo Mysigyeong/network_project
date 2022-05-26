@@ -1,10 +1,31 @@
+#include "ns3/log.h"
+#include "ns3/ipv4-address.h"
+#include "ns3/ipv6-address.h"
+
+#include "ns3/nstime.h"
+#include "ns3/inet-socket-address.h"
+#include "ns3/inet6-socket-address.h"
+#include "ns3/socket.h"
+#include "ns3/simulator.h"
+#include "ns3/socket-factory.h"
+
+#include "ns3/packet.h"
+#include "ns3/uinteger.h"
+#include "ns3/trace-source-accessor.h"
 
 #include "uno-card.h"
+#include "uno-packet.h"
+#include "uno-server.h"
 
 using namespace std;
-
+using namespace ns3;
 Uno::Uno()
 {
+    turn=0;
+    playing=0;
+    player_No=0;
+
+
     for(uint32_t i=1; i<5; i++)
     {
         //색상 선택
@@ -52,7 +73,6 @@ Uno::Uno()
             deck.push_back(c2);
         }
     }
-
     //셔플
     Shuffle();
 }

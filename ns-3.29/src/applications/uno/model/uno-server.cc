@@ -29,13 +29,19 @@
 #include "ns3/trace-source-accessor.h"
 
 #include "uno-server.h"
+#include "uno-card.h"
+#include "uno-packet.h"
 
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("UnoServerApplication");
 
-
 NS_OBJECT_ENSURE_REGISTERED (UnoServer);
+
+Uno unogame;
+uint32_t ready_player;
+
+long long seq_num;
 
 
 TypeId
@@ -176,7 +182,8 @@ UnoServer::StartApplication (void)
         PrepareSocket(i);
     }
 
-    m_sendEvent = Simulator::Schedule (Seconds(0.), &UnoServer::Send, this, 0);
+    m_sendEvent = Simulator::Schedule (Seconds(0.), &UnoServer::InitUno, this, 3);//여기에 맨뒤에 참가 인원 수
+    m_sendEvent = Simulator::Schedule (Seconds(20.), &UnoServer::Send, this, 0);
 }
 
 void 
@@ -211,14 +218,12 @@ UnoServer::Send (uint32_t clientIdx)
     UnoPacket unoPacket;
 
     // Setting unoPacket
-    
     p = Create<Packet> (reinterpret_cast<uint8_t*>(&unoPacket), sizeof(unoPacket));
   
     //-------------------------------------------
 
     Address localAddress;
     m_socket[clientIdx]->GetSockName (localAddress);
-    
     m_socket[clientIdx]->Send (p);
 
     if (InetSocketAddress::IsMatchingType (m_clientAddress[clientIdx]))
@@ -230,7 +235,41 @@ UnoServer::Send (uint32_t clientIdx)
 
     m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx + 1) % m_numOfSocket);
 }
+void UnoServer::PacketRead(Ptr<Packet> packet)
+{
 
+  uint32_t gameop,uid;
+  uint8_t *buf = new uint8_t[packet->GetSize()];
+  cout<<endl;
+  NS_LOG_INFO("packet payload, here is server");
+  packet->CopyData(buf, packet->GetSize ());
+  uint8_t *tempbuf=buf;
+  string s = string(tempbuf,tempbuf+4);
+  cout<<"sequence number: "<<uint32_t(s[0])<<endl;
+  tempbuf=tempbuf+4;
+  s = string(tempbuf,tempbuf+4); 
+  cout<<"uid: "<<uint32_t(s[0])<<endl;
+  tempbuf=tempbuf+4;
+  uid=uint32_t(s[0]);
+  s = string(tempbuf,tempbuf+4);
+  cout<<"Game operation: "<<uint32_t(s[0])<<endl;
+  tempbuf=tempbuf+4;
+
+  gameop=uint32_t(s[0]);
+   
+  s = string(tempbuf,tempbuf+4);
+  cout<<"User operation: "<<uint32_t(s[0])<<endl;
+    
+  //userop=uint32_t(s[0]);
+
+  if(gameop==0){
+    ready_player++;
+    cout<<uid<<" player ready"<<endl;
+    if(ready_player==unogame.player_No)
+        cout<<"All player ready to start!!"<<endl;
+  }
+
+}
 void
 UnoServer::HandleRead (Ptr<Socket> socket)
 {
@@ -245,8 +284,54 @@ UnoServer::HandleRead (Ptr<Socket> socket)
           NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server received " << packet->GetSize () << " bytes from " <<
                        InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
                        InetSocketAddress::ConvertFrom (from).GetPort ());
+          PacketRead(packet);
         }
       socket->GetSockName (localAddress);
+    }
+
+
+}
+
+Ptr<Packet>
+UnoServer::UnoPacketCreate(uint32_t uid)
+{
+
+    Ptr<Packet> p;
+
+    UnoPacket up;
+    up.seq=seq_num++;
+    up.gameOp=GameOp::INIT;
+    up.numOfCards=7;
+
+    
+    up.uid=uid;
+    for(int j=0;j<7;j++)
+    {
+        up.cards[j]=unogame.Draw();
+    }
+    up.color=unogame.front.color;
+
+    p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
+    
+    return p;
+}
+
+
+void
+UnoServer::InitUno(uint32_t num)
+{
+    seq_num=123;
+    ready_player=0;
+    unogame.turn=0;
+    unogame.playing=0;
+    unogame.player_No=num;
+    unogame.front=unogame.Draw();
+    for(uint32_t i=0;i<num;i++)
+    {
+        Address localAddress;
+        m_socket[i]->GetSockName (localAddress);
+        m_socket[i]->Send (UnoPacketCreate(i));
+
     }
 }
 

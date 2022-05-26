@@ -17,7 +17,6 @@ int main(int argc, char* argv[])
     CommandLine cmd;
     cmd.AddValue("Num_Client", "Number of clients", num_client);
     cmd.Parse(argc, argv);
-    
     LogComponentEnable("UnoServerApplication", LOG_LEVEL_INFO);
     LogComponentEnable("UnoClientApplication", LOG_LEVEL_INFO);
 

@@ -1,12 +1,14 @@
 #ifndef UNO_CARD_H
 #define UNO_CARD_H
+
 #include <iostream>
 #include <stack>
 #include <vector>
 #include <algorithm>
 #include <iterator>
 #include <random>
-
+#include "ns3/simulator.h"
+#include "ns3/packet.h"
 using namespace std;
 
 //Normal card
@@ -34,9 +36,15 @@ struct card{
 
 class Uno{
     public:
+
+    card front;  //현재 맨위의 카드
+    uint32_t turn; // 턴 수
+    uint32_t playing; //현재 차례인 player
+    uint32_t player_No; //player 수
+
     vector <card> deck;
     vector <card> trash_deck;
-
+    
     public:
     Uno();
     void Shuffle();
