@@ -27,6 +27,7 @@
 #include "ns3/packet.h"
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"
+#include "time.h"
 
 #include "uno-server.h"
 #include "uno-card.h"
@@ -38,6 +39,9 @@ NS_LOG_COMPONENT_DEFINE ("UnoServerApplication");
 
 NS_OBJECT_ENSURE_REGISTERED (UnoServer);
 
+bool stopbroadcast = false;
+bool now_uno = false;
+uint32_t uno_player_uid;
 Uno unogame;
 uint32_t ready_player;  //init 시 player 체크 
 uint32_t turn_count;    //턴 마다 player 체크
@@ -167,6 +171,8 @@ UnoServer::StartApplication (void)
 {
     NS_LOG_FUNCTION (this);
 
+    srand((unsigned int)time(NULL));
+
     m_clientAddress[0] = m_clientAddress1;
     m_clientAddress[1] = m_clientAddress2;
     m_clientAddress[2] = m_clientAddress3;
@@ -182,7 +188,7 @@ UnoServer::StartApplication (void)
         PrepareSocket(i);
     }
 
-    m_sendEvent = Simulator::Schedule (Seconds(0.), &UnoServer::InitUno, this, 3);//여기에 맨뒤에 참가 인원 수
+    m_sendEvent = Simulator::Schedule (Seconds(0.), &UnoServer::InitUno, this, m_numOfSocket);//여기에 맨뒤에 참가 인원 수
     m_sendEvent = Simulator::Schedule (Seconds(5.), &UnoServer::Send, this, 0);
 }
 
@@ -238,7 +244,10 @@ UnoServer::Send (uint32_t clientIdx)
                      << " port " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetPort ()<<endl<<endl);
     }
 
-    m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx + 1) % m_numOfSocket);
+    if(!stopbroadcast){
+        m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx + 1) % m_numOfSocket);
+    }
+    
 }
 
 void UnoServer::PacketRead(Ptr<Packet> packet)
@@ -279,6 +288,38 @@ void UnoServer::PacketRead(Ptr<Packet> packet)
                 unogame.Collect_Trash(unogame.front);    
                 unogame.front=uno_packet->passingcard;
                 cout<<"Front Card Updated!"<<endl;
+
+                if(uno_packet->numOfCards == 1){
+                    cout << uno_packet->uid << "th Player have only 1 card so it's time to uno!" << endl;
+                    uint32_t num[10];
+                    for(uint32_t i = 0; i < m_numOfSocket; i++){
+                        num[i] = i;
+                    }
+                    for(int i = 0; i < 100; i++){
+                        int srand1 = rand() % m_numOfSocket;
+                        int srand2 = rand() % m_numOfSocket;
+                        uint32_t temp;
+                        temp = num[srand1];
+                        num[srand1] = num[srand2];
+                        num[srand2] = temp;
+                    }
+                    for(uint32_t i = 0; i < m_numOfSocket; i++){
+                        m_socket[num[i]]->Send(UnoUnoPacketCreate(num[i]));
+                    }
+                    uno_player_uid = uno_packet->uid;
+                    Simulator::Cancel(m_sendEvent);
+                    stopbroadcast = true;
+                    now_uno = true;
+                }
+                
+                if(uno_packet->numOfCards == 0){
+                    cout << uno_packet->uid << "th Player have 0 card so game is end" << endl << "Congraturation " << uno_packet->uid << endl;
+                    Simulator::Cancel(m_sendEvent);
+                    stopbroadcast = true;
+                    for(uint32_t i = 0; i < m_numOfSocket; i++){
+                        m_socket[i]->Send(UnoEndPacketCreate(i));
+                    }
+                }
             }
 
             //user가 draw 했으면,
@@ -299,10 +340,27 @@ void UnoServer::PacketRead(Ptr<Packet> packet)
 
         //UNO
         case GameOp::UNO:
+          if(uno_packet->userOp==UserOp::UNO){
+              if(now_uno){
+                  now_uno = false;
+                  stopbroadcast = false;
+                  m_sendEvent = Simulator::Schedule (Seconds(5.), &UnoServer::Send, this, 0);
+                  if(uno_packet->uid != uno_player_uid){
+                    cout << uno_player_uid << "th player is too slow so draw 2 card" << endl;
+                    m_socket[uno_player_uid]->Send(DrawCardPacketCreate(uno_player_uid));
+                    m_socket[uno_player_uid]->Send(DrawCardPacketCreate(uno_player_uid));   
+                  } 
+                  else{
+                    cout << uno_player_uid << "th player fast so do not draw card" << endl;
+                  }
+              }
+          }
+        
           break;
 
         //GAMEOVER
         case GameOp::GAMEOVER:
+          cout << uno_packet->uid << "th player get end_game packet" << endl;
           break;
 
         //WAIT
@@ -336,7 +394,40 @@ UnoServer::HandleRead (Ptr<Socket> socket)
     }
 }
 
+Ptr<Packet>
+UnoServer::UnoUnoPacketCreate(uint32_t uid)
+{
 
+    Ptr<Packet> p;
+
+    UnoPacket up;
+    up.seq=seq_num++;
+    up.gameOp=GameOp::UNO;
+
+    up.uid=uid;
+
+    p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
+    
+    return p;
+}
+
+
+Ptr<Packet>
+UnoServer::UnoEndPacketCreate(uint32_t uid)
+{
+
+    Ptr<Packet> p;
+
+    UnoPacket up;
+    up.seq=seq_num++;
+    up.gameOp=GameOp::GAMEOVER;
+
+    up.uid=uid;
+
+    p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
+    
+    return p;
+}
 
 Ptr<Packet>
 UnoServer::UnoPacketCreate(uint32_t uid)
