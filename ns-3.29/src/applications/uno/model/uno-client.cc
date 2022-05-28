@@ -40,6 +40,8 @@ NS_LOG_COMPONENT_DEFINE ("UnoClientApplication");
 NS_OBJECT_ENSURE_REGISTERED (UnoClient);
 
 
+uint32_t this_uid;
+
 TypeId
 UnoClient::GetTypeId (void)
 {
@@ -128,7 +130,7 @@ UnoClient::Answer(Ptr<Packet> packet)
       NS_LOG_INFO("packet payload - Client ");
       packet->CopyData(buf, packet->GetSize());
       uno_packet=reinterpret_cast<UnoPacket*>(buf);
-      
+      this_uid = uno_packet->uid;
 
       //Pakcet Read
       cout<< "Sequence Number    : "<< uno_packet->seq <<endl;
@@ -182,11 +184,15 @@ UnoClient::Answer(Ptr<Packet> packet)
 
         //UNO
         case GameOp::UNO:
+          cout << this_uid << "th player say uno!" << endl;
+          ret_packet = CreateReactionPacket(*uno_packet);
           break;
 
 
         //GAMEOVER
         case GameOp::GAMEOVER:
+          cout << this_uid << "th player end game";
+          ret_packet=CreateReactionPacket(*uno_packet);
           break;
 
         //WAIT
@@ -334,7 +340,7 @@ UnoClient::CreateReactionPacket(UnoPacket recv_packet)
       else{
         for(int i=0;i<int(mycards.list.size());i++){
           //발견시 해당 카드 내려 놓기
-          if(deck_front.color==mycards.list.at(i).color || deck_front.number==mycards.list.at(i).number){
+          if(mycards.list.at(i).color == 0 || deck_front.color ==mycards.list.at(i).color || deck_front.number==mycards.list.at(i).number){
             pass_index=i;
             pass=true;
             up.passingcard=mycards.list.at(i);
@@ -371,6 +377,17 @@ UnoClient::CreateReactionPacket(UnoPacket recv_packet)
       }
       if(recv_packet.gameOp==GameOp::DRAW){
         up.gameOp=GameOp::DRAW;
+        up.uid=recv_packet.uid;
+        up.seq=recv_packet.seq;
+      }
+      if(recv_packet.gameOp==GameOp::GAMEOVER){
+        up.gameOp=GameOp::GAMEOVER;
+        up.uid=recv_packet.uid;
+        up.seq=recv_packet.seq;
+      }
+      if(recv_packet.gameOp==GameOp::UNO){
+        up.gameOp=GameOp::UNO;
+        up.userOp=UserOp::UNO;
         up.uid=recv_packet.uid;
         up.seq=recv_packet.seq;
       }
