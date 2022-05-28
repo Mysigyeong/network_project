@@ -13,7 +13,7 @@ using namespace ns3;
 
 int main(int argc, char* argv[])
 {
-    uint32_t num_client;
+    uint32_t num_client = 3;
     CommandLine cmd;
     cmd.AddValue("Num_Client", "Number of clients", num_client);
     cmd.Parse(argc, argv);
