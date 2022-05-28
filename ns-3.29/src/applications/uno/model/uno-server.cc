@@ -39,8 +39,8 @@ NS_LOG_COMPONENT_DEFINE ("UnoServerApplication");
 NS_OBJECT_ENSURE_REGISTERED (UnoServer);
 
 Uno unogame;
-uint32_t ready_player;
-
+uint32_t ready_player;  //init 시 player 체크 
+uint32_t turn_count;    //턴 마다 player 체크
 long long seq_num;
 
 
@@ -183,7 +183,7 @@ UnoServer::StartApplication (void)
     }
 
     m_sendEvent = Simulator::Schedule (Seconds(0.), &UnoServer::InitUno, this, 3);//여기에 맨뒤에 참가 인원 수
-    m_sendEvent = Simulator::Schedule (Seconds(20.), &UnoServer::Send, this, 0);
+    m_sendEvent = Simulator::Schedule (Seconds(5.), &UnoServer::Send, this, 0);
 }
 
 void 
@@ -215,7 +215,12 @@ UnoServer::Send (uint32_t clientIdx)
 
     //--------------------------------------------
 
+    //General Broadcasting
     UnoPacket unoPacket;
+    unogame.playing==clientIdx ? unoPacket.gameOp=GameOp::TURN : unoPacket.gameOp=GameOp::WAIT;
+    unoPacket.frontcard=unogame.front;
+    unoPacket.playing=unogame.playing;
+    unoPacket.uid=clientIdx;
 
     // Setting unoPacket
     p = Create<Packet> (reinterpret_cast<uint8_t*>(&unoPacket), sizeof(unoPacket));
@@ -230,46 +235,87 @@ UnoServer::Send (uint32_t clientIdx)
     {
         NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server sent " << sizeof(unoPacket) << " bytes to client "
                      << clientIdx + 1 << " " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetIpv4 ()
-                     << " port " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetPort ());
+                     << " port " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetPort ()<<endl<<endl);
     }
 
     m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx + 1) % m_numOfSocket);
 }
+
 void UnoServer::PacketRead(Ptr<Packet> packet)
 {
+    UnoPacket* uno_packet;
+    Ptr<Packet> ret_packet;
+    uint8_t *buf = new uint8_t[packet->GetSize()];
 
-  uint32_t gameop,uid;
-  uint8_t *buf = new uint8_t[packet->GetSize()];
-  cout<<endl;
-  NS_LOG_INFO("packet payload, here is server");
-  packet->CopyData(buf, packet->GetSize ());
-  uint8_t *tempbuf=buf;
-  string s = string(tempbuf,tempbuf+4);
-  cout<<"sequence number: "<<uint32_t(s[0])<<endl;
-  tempbuf=tempbuf+4;
-  s = string(tempbuf,tempbuf+4); 
-  cout<<"uid: "<<uint32_t(s[0])<<endl;
-  tempbuf=tempbuf+4;
-  uid=uint32_t(s[0]);
-  s = string(tempbuf,tempbuf+4);
-  cout<<"Game operation: "<<uint32_t(s[0])<<endl;
-  tempbuf=tempbuf+4;
+    cout<<"-----------------------------------------------------------"<<endl;
+    NS_LOG_INFO("packet payload, Server");
+    packet->CopyData(buf, packet->GetSize());
+    uno_packet=reinterpret_cast<UnoPacket*>(buf);
 
-  gameop=uint32_t(s[0]);
-   
-  s = string(tempbuf,tempbuf+4);
-  cout<<"User operation: "<<uint32_t(s[0])<<endl;
-    
-  //userop=uint32_t(s[0]);
 
-  if(gameop==0){
-    ready_player++;
-    cout<<uid<<" player ready"<<endl;
-    if(ready_player==unogame.player_No)
-        cout<<"All player ready to start!!"<<endl;
-  }
+    cout<<"Sequence Number    : "<<uno_packet->seq<<endl;
+    cout<<"uid                : "<<uno_packet->uid<<endl;
+    cout<<"Game operation     : "<<goptostring(uno_packet->gameOp)<<endl;
+    cout<<"User operation     : "<<uoptostring(uno_packet->userOp)<<endl;
+
+    switch(uno_packet->gameOp){
+        case GameOp::INIT:
+          ready_player++;
+          cout<<"player "<<uno_packet->uid<<" is ready"<<endl<<endl;
+          if(ready_player==unogame.player_No){
+            cout<<"All player ready to start!!"<<endl<<endl;
+            cout<<"\n-----------------------------------------Game Start-------------------------------------------"<<endl;
+            cout<<"----------------------------------------------------------------------------------------------"<<endl<<endl<<endl;
+            unogame.turn++;
+          }
+          break;
+
+        case GameOp::TURN:
+            unogame.turn++;
+            unogame.playing=(unogame.playing+1)%unogame.player_No;
+            //user가 play 했으면,
+            if(uno_packet->userOp==UserOp::PLAY){
+                //원래 위에 있던 카드는 trash로, front는 passing card로
+                unogame.Collect_Trash(unogame.front);    
+                unogame.front=uno_packet->passingcard;
+                cout<<"Front Card Updated!"<<endl;
+            }
+
+            //user가 draw 했으면,
+            if(uno_packet->userOp==UserOp::DRAW){
+                Address localAddress;
+                m_socket[uno_packet->uid]->GetSockName (localAddress);
+                m_socket[uno_packet->uid]->Send (DrawCardPacketCreate(uno_packet->uid));
+                cout<<"Cards are now passing to the user!"<<endl<<endl;
+            }
+            break;
+
+        case GameOp::DRAW:
+            cout<<"Card draw Success"<<endl<<endl;
+            break;
+        //PENALTY
+        case GameOp::PENALTY:
+          break;
+
+        //UNO
+        case GameOp::UNO:
+          break;
+
+        //GAMEOVER
+        case GameOp::GAMEOVER:
+          break;
+
+        //WAIT
+        case GameOp::WAIT:
+            break;
+
+        default:
+            break;
+    }
 
 }
+
+
 void
 UnoServer::HandleRead (Ptr<Socket> socket)
 {
@@ -288,9 +334,9 @@ UnoServer::HandleRead (Ptr<Socket> socket)
         }
       socket->GetSockName (localAddress);
     }
-
-
 }
+
+
 
 Ptr<Packet>
 UnoServer::UnoPacketCreate(uint32_t uid)
@@ -316,12 +362,28 @@ UnoServer::UnoPacketCreate(uint32_t uid)
     return p;
 }
 
+Ptr<Packet>
+UnoServer::DrawCardPacketCreate(uint32_t uid)
+{
+    Ptr<Packet> p;
+
+    UnoPacket up;
+    up.seq=seq_num++;
+    up.gameOp=GameOp::DRAW;
+
+    up.uid=uid;
+    up.passingcard=unogame.Draw();
+
+    p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
+    return p;
+}
 
 void
 UnoServer::InitUno(uint32_t num)
 {
     seq_num=123;
     ready_player=0;
+    turn_count=0;
     unogame.turn=0;
     unogame.playing=0;
     unogame.player_No=num;
@@ -334,5 +396,31 @@ UnoServer::InitUno(uint32_t num)
 
     }
 }
+
+const char*
+UnoServer::goptostring(GameOp gop){
+  switch(gop){
+    case GameOp::INIT:      return "INIT";
+    case GameOp::TURN:      return "TURN";
+    case GameOp::DRAW:      return "DRAW";
+    case GameOp::PENALTY:   return "PENALTY";
+    case GameOp::UNO:       return "UNO";
+    case GameOp::GAMEOVER:  return "GAMEOVER";
+    case GameOp::WAIT:      return "WAIT";
+    default:                return "Not Meaningful";
+  }
+}
+
+const char*
+UnoServer::uoptostring(UserOp uop){
+    switch(uop){
+        case UserOp::PLAY:      return "PLAY";
+        case UserOp::DRAW:      return "DRAW";
+        case UserOp::UNO:      return "UNO";
+        default:                return "Not Meaningful";
+    }
+}
+
+
 
 } // Namespace ns3

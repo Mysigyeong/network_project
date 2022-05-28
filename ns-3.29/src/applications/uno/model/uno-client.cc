@@ -39,6 +39,7 @@ NS_LOG_COMPONENT_DEFINE ("UnoClientApplication");
 
 NS_OBJECT_ENSURE_REGISTERED (UnoClient);
 
+
 TypeId
 UnoClient::GetTypeId (void)
 {
@@ -119,100 +120,80 @@ UnoClient::StopApplication ()
 Ptr<Packet>
 UnoClient::Answer(Ptr<Packet> packet)
 {
-      uint32_t gameop;
-      uint8_t *buf = new uint8_t[packet->GetSize()];
+      //Variables Settting
+      UnoPacket* uno_packet;
       Ptr<Packet> ret_packet;
-      cout<<endl;
-      NS_LOG_INFO("packet payload ");
+      uint8_t *buf = new uint8_t[packet->GetSize()];
+      cout<<"-----------------------------------------------------------"<<endl;
+      NS_LOG_INFO("packet payload - Client ");
+      packet->CopyData(buf, packet->GetSize());
+      uno_packet=reinterpret_cast<UnoPacket*>(buf);
+      
 
-      packet->CopyData(buf, packet->GetSize ());
-      uint8_t *tempbuf=buf;
-      string s = string(tempbuf,tempbuf+4);
-      cout<<"sequence number: "<<uint32_t(s[0])<<endl;
-      tempbuf=tempbuf+4;
-      s = string(tempbuf,tempbuf+4);
-      cout<<"uid: "<<uint32_t(s[0])<<endl;
-      tempbuf=tempbuf+4;
+      //Pakcet Read
+      cout<< "Sequence Number    : "<< uno_packet->seq <<endl;
+      cout<< "uid                : "<< uno_packet->uid <<endl;
+      cout<< "Game Operation     : "<< UnoClient::goptostring(uno_packet->gameOp)<<endl;
       
-      s = string(tempbuf,tempbuf+4);
-      cout<<"Game operation: "<<uint32_t(s[0])<<endl;
-      tempbuf=tempbuf+4;
+      //Cards on your hand
       
-      gameop=uint32_t(s[0]);
-      
-      s = string(tempbuf,tempbuf+4);
-      //cout<<"User operation: "<<uint32_t(s[0])<<endl; 이 부분은 server에 추가
-      tempbuf=tempbuf+4;
-      
-      s = string(tempbuf,tempbuf+4);
-      cout<<"The number of cards: "<<uint32_t(s[0])<<endl;
-      tempbuf=tempbuf+4;
-      
-      for(int i=0;i<7;i++){
-      
-        s = string(tempbuf,tempbuf+4);
-        switch(uint32_t(s[0]))
-        {
-            case 0:
-                cout<<i+1<<" Special card ";
-                break;
-            case 1:
-                cout<<i+1<<" card color is Red";
-                break;
-            case 2:
-                cout<<i+1<<" card color is Yellow";
-                break;
-            case 3:
-                cout<<i+1<<" card color is Blue";
-                break;
-            case 4:
-                cout<<i+1<<" card color is Green";
-                break;
-            default:
-                break;
-        }
-        
-        tempbuf=tempbuf+4;
-        s = string(tempbuf,tempbuf+4);
-        if(uint32_t(s[0])>9)
-        {
-            switch(uint32_t(s[0]))
-            {
-                case 10:
-                    cout<<" Skip!! "<<endl;
-                    break;
-                case 11:
-                    cout<<" Reverse!! "<<endl;
-                    break;
-                case 12:
-                    cout<<" Draw Two!! "<<endl;
-                    break;
-                case 13:
-                    cout<<" Wild!! "<<endl;
-                    break;
-                case 14:
-                    cout<<" Wild & Draw Four!! "<<endl;
-                    break;
-                default:
-                    break;
+      switch(uno_packet->gameOp){
+        case GameOp::INIT:
+            cout<<"First Draw"<<endl;
+            mycards.number=uno_packet->numOfCards;
+            for(int i=0;i<int(uno_packet->numOfCards);i++){
+              mycards.list.push_back(uno_packet->cards[i]);
+              printCard(mycards.list.at(i), i);              
             }
-        }
-        else
-            cout<<" and number is "<<uint32_t(s[0])<<endl;
-        tempbuf=tempbuf+4;
-      }
+            cout<<endl;
 
-      s = string(tempbuf+4,tempbuf+8);
-      cout<<"The color of the front card: "<<uint32_t(s[0])<<endl;
-      tempbuf=tempbuf+4;
-      s = string(tempbuf,tempbuf+4);
-      cout<<"The number of the front card: "<<uint32_t(s[0])<<endl<<endl;
-      
-      
-      switch(gameop){
-        case 0:
-            cout<<"You ready to play?"<<endl;
+            cout<<"You ready to play?" << endl;
             ret_packet=packet;
+            break;
+
+        //Turn
+        case GameOp::TURN:
+          cout<<"Card List : "<<endl;
+          for(int i=0;i<int(mycards.list.size());i++){
+              printCard(mycards.list.at(i), i);              
+          }
+          cout<<endl;
+
+          cout<<"Front Card : "<<"("<<uno_packet->frontcard.color<<","<<uno_packet->frontcard.number<<")"<<endl;
+          ret_packet=CreateReactionPacket(*uno_packet);
+          break;
+
+        case GameOp::DRAW:
+          cout<<"----------Draw New Card----------"<<endl;
+          cout<<"Card List : "<<endl;
+          mycards.list.push_back(uno_packet->passingcard);
+          mycards.number++;
+          for(int i=0;i<int(mycards.number);i++){
+              printCard(mycards.list.at(i), i);              
+          }
+          cout<<endl;
+
+          ret_packet=CreateReactionPacket(*uno_packet);
+
+        //PENALTY
+        case GameOp::PENALTY:
+          break;
+
+
+        //UNO
+        case GameOp::UNO:
+          break;
+
+
+        //GAMEOVER
+        case GameOp::GAMEOVER:
+          break;
+
+        //WAIT
+        case GameOp::WAIT:
+            cout<<"It's "<<uno_packet->playing<<"s turn! Wait"<<endl;
+            cout<<"Front Card : "<<"("<<uno_packet->frontcard.color<<","<<uno_packet->frontcard.number<<")"<<endl;
+            ret_packet=CreateReactionPacket(*uno_packet);
             break;
 
         default:
@@ -220,10 +201,23 @@ UnoClient::Answer(Ptr<Packet> packet)
 
 
       }
-      cout<<endl;
-
       return ret_packet;
 }
+
+const char*
+UnoClient::goptostring(GameOp gop){
+  switch(gop){
+    case GameOp::INIT:      return "INIT";
+    case GameOp::TURN:      return "TURN";
+    case GameOp::DRAW:      return "DRAW";
+    case GameOp::PENALTY:   return "PENALTY";
+    case GameOp::UNO:       return "UNO";
+    case GameOp::GAMEOVER:  return "GAMEOVER";
+    case GameOp::WAIT:      return "WAIT";
+    default:                return "Error";
+  }
+}
+
 
 void 
 UnoClient::HandleRead (Ptr<Socket> socket)
@@ -249,18 +243,148 @@ UnoClient::HandleRead (Ptr<Socket> socket)
       packet->RemoveAllPacketTags ();
       packet->RemoveAllByteTags ();
 
-
       NS_LOG_LOGIC ("Ack packet");
 
       socket->SendTo (packet, 0, from);
 
       if (InetSocketAddress::IsMatchingType (from))
         {
+          cout<<"-----------------------------------------------------------"<<endl;
           NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client sent " << packet->GetSize () << " bytes to " <<
                        InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
-                       InetSocketAddress::ConvertFrom (from).GetPort ());
+                       InetSocketAddress::ConvertFrom (from).GetPort () << endl << endl);
         }
     }
 }
 
+void
+UnoClient::printCard(card card, int index)
+{
+  switch(card.color)
+  {
+      case 0:
+          cout<<"(Special, ";
+          break;
+      case 1:
+          cout<<"(Red, ";
+          break;
+      case 2:
+          cout<<"(Yellow, ";
+          break;
+      case 3:
+          cout<<"(Blue, ";
+          break;
+      case 4:
+          cout<<"(Green, ";
+          break;
+      default:
+          break;
+  }
+        
+
+  if(card.number>9)
+  {
+      switch(card.number)
+      {
+          case 10:
+              cout<<"Skip) ";
+              break;
+          case 11:
+              cout<<"Reverse) ";
+              break;
+          case 12:
+              cout<<"Draw Two) ";
+              break;
+          case 13:
+              cout<<"Wild) ";
+              break;
+          case 14:
+              cout<<"Wild & Draw Four) ";
+              break;
+          default:
+              break;
+      }
+  }
+  else
+  {
+    cout<<card.number<<") ";
+  }
+
+  return;
+}
+
+Ptr<Packet>
+UnoClient::CreateReactionPacket(UnoPacket recv_packet)
+{
+    Ptr<Packet> p;
+    UnoPacket up;
+    card deck_front=recv_packet.frontcard;
+    
+    if(recv_packet.gameOp==GameOp::TURN){
+      bool  pass=false;
+      int   pass_index=0;
+      //덱 위에 있는 카드가 스페셜 카드면 0번째 카드를 내려 놓는다.
+      //규칙이 정확하지 않아서 이 부분은 special 맡으신 분이 체크 부탁드립니다.
+      if(deck_front.number>=10){
+        up.passingcard=mycards.list.at(pass_index);
+        pass_index=0;
+        pass=true;
+      }
+      //덱 위에 있는 카드가 스페셜 카드가 아니면, 손에 들고 있는 카드를 체크한다.
+      else{
+        for(int i=0;i<int(mycards.list.size());i++){
+          //발견시 해당 카드 내려 놓기
+          if(deck_front.color==mycards.list.at(i).color || deck_front.number==mycards.list.at(i).number){
+            pass_index=i;
+            pass=true;
+            up.passingcard=mycards.list.at(i);
+          }
+        }
+      }
+
+      if(pass){
+        //내 손에서 카드 제거
+        mycards.list.erase(mycards.list.begin()+pass_index);
+        mycards.number=mycards.list.size();
+        //UserOp는 Play
+        up.userOp=UserOp::PLAY;
+      }else{
+        //UserOp는 Draw
+        up.userOp=UserOp::DRAW;
+      }
+      up.seq=recv_packet.seq;
+      up.uid=recv_packet.uid;
+      up.gameOp=recv_packet.gameOp;
+      up.numOfCards=mycards.number;
+      pass ?
+        cout<<"Action : PLAY, Card : "<<"("<<up.passingcard.color<<","<<up.passingcard.number<<")"<<endl
+          :
+        cout<<"Action : Draw"<<endl;;
+    }
+
+    //turn이 아닐 경우 구현
+    else{
+      if(recv_packet.gameOp==GameOp::WAIT){
+        up.gameOp=GameOp::WAIT;
+        up.uid=recv_packet.uid;
+        up.seq=recv_packet.seq;
+      }
+      if(recv_packet.gameOp==GameOp::DRAW){
+        up.gameOp=GameOp::DRAW;
+        up.uid=recv_packet.uid;
+        up.seq=recv_packet.seq;
+      }
+    }
+
+
+
+
+
+
+    p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
+    
+    return p;
+}
+
 } // Namespace ns3
+
