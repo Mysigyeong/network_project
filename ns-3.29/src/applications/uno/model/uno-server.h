@@ -64,7 +64,7 @@ private:
    * \brief Send a packet to clientIdx
    */
   void Send (uint32_t clientIdx);
-
+  void Send2 (uint32_t clientIdx);
   /**
    * \brief Handle a packet reception.
    *
@@ -86,6 +86,7 @@ private:
   Ptr<Packet> UnoUnoPacketCreate(uint32_t uid);
   Ptr<Packet> ChangeColorCreate(uint32_t uid);
   Ptr<Packet> BlockPacketCreate(uint32_t uid);
+  Ptr<Packet> ChangeOrder(uint32_t uid);
   void PacketRead(Ptr<Packet> packet);
   const char* goptostring(GameOp gop);
   const char* uoptostring(UserOp uop);

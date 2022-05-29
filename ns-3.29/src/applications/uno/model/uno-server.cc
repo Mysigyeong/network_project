@@ -41,6 +41,7 @@ NS_OBJECT_ENSURE_REGISTERED (UnoServer);
 
 bool stopbroadcast = false;
 bool now_uno = false;
+bool change_order=false;
 uint32_t uno_player_uid;
 Uno unogame;
 uint32_t ready_player;  //init 시 player 체크 
@@ -245,10 +246,12 @@ UnoServer::Send (uint32_t clientIdx)
                      << " port " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetPort ()<<endl<<endl);
     }
 
-    if(!stopbroadcast){
+    if(!stopbroadcast && !change_order){
         m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx + 1) % m_numOfSocket);
     }
-    
+    if(!stopbroadcast && change_order){
+	    m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx - 1) % m_numOfSocket);
+    }
 }
 
 void UnoServer::PacketRead(Ptr<Packet> packet)
@@ -282,7 +285,18 @@ void UnoServer::PacketRead(Ptr<Packet> packet)
 
         case GameOp::TURN:
             unogame.turn++;
-            unogame.playing=(unogame.playing+1)%unogame.player_No;
+	    if (!change_order){
+		    unogame.playing=(unogame.playing+1)%unogame.player_No;
+	    }
+	    else{
+		    if(unogame.playing-1<0)
+                    {
+                            unogame.playing=unogame.player_No-1;
+                    }
+                    else{
+                             unogame.playing=(unogame.playing-1)%unogame.player_No;
+                    }
+	    }
             //user가 play 했으면,
             if(uno_packet->userOp==UserOp::PLAY){
                 //원래 위에 있던 카드는 trash로, front는 passing card로
@@ -337,31 +351,101 @@ void UnoServer::PacketRead(Ptr<Packet> packet)
             break;
         //PENALTY
         case GameOp::PENALTY:
-	    unogame.turn++;
-            unogame.playing=(unogame.playing+1)%unogame.player_No;
-	    unogame.Collect_Trash(unogame.front);
+	        unogame.turn++;
+            //unogame.playing=(unogame.playing+1)%unogame.player_No;
+	        unogame.Collect_Trash(unogame.front);
             unogame.front=uno_packet->passingcard;
-	    if(uno_packet->passingcard.number==10)
-	    {
-		    cout<<unogame.playing<<"th player will be blocked"<<endl;
-		    m_socket[unogame.playing]->Send(BlockPacketCreate(unogame.playing));
-	    }
+	        if(uno_packet->passingcard.number==10)
+	        {
+                //unogame.playing=(unogame.playing+1)%unogame.player_No;
+                if (!change_order){
+                    	unogame.playing=(unogame.playing+1)%unogame.player_No;
+           	    }
+            	else{
+                    if(unogame.playing==0)
+                   	 {
+                        unogame.playing=unogame.player_No-1;
+                   	 }
+                    else{
+                        unogame.playing=(unogame.playing-1)%unogame.player_No;
+                   	 }
+                }
+		        cout<<unogame.playing<<"th player will be blocked"<<endl;
+		        m_socket[unogame.playing]->Send(BlockPacketCreate(unogame.playing));
+	        }
+	        if(uno_packet->passingcard.number==11)
+	        {
+		        change_order=!change_order;
+		        if (!change_order){
+                    	unogame.playing=(unogame.playing+1)%unogame.player_No;
+           	    }
+            	else{
+                    if(unogame.playing==0)
+                   	 {
+                        unogame.playing=unogame.player_No-1;
+                   	 }
+                    else{
+                        unogame.playing=(unogame.playing-1)%unogame.player_No;
+                   	 }
+                }
+		    cout<<"Order will be change"<<endl;
+		    m_socket[unogame.playing]->Send(ChangeOrder(unogame.playing));
+    	    }
+
 	    if(uno_packet->passingcard.number==12)
 	    {
+		    //unogame.playing=(unogame.playing+1)%unogame.player_No;
+            if (!change_order){
+                    	unogame.playing=(unogame.playing+1)%unogame.player_No;
+           	    }
+            	else{
+                    if(unogame.playing==0)
+                   	 {
+                        unogame.playing=unogame.player_No-1;
+                   	 }
+                    else{
+                        unogame.playing=(unogame.playing-1)%unogame.player_No;
+                   	 }
+                }
 		    cout<<unogame.playing<<"th player will get two cards"<<endl;
 		    m_socket[unogame.playing]->Send(DrawTwoCardPacketCreate(unogame.playing));
-                    //m_socket[unogame.playing]->Send(DrawCardPacketCreate(unogame.playing));
 	    }
 	    if(uno_packet->passingcard.number==13)
 	    {
+		    //unogame.playing=(unogame.playing+1)%unogame.player_No;
+            if (!change_order){
+                    	unogame.playing=(unogame.playing+1)%unogame.player_No;
+           	    }
+            	else{
+                    if(unogame.playing==0)
+                   	 {
+                        unogame.playing=unogame.player_No-1;
+                   	 }
+                    else{
+                        unogame.playing=(unogame.playing-1)%unogame.player_No;
+                   	 }
+                }
 		    cout<<unogame.playing-1<<"th player changed color"<<endl;
 		    m_socket[unogame.playing]->Send(ChangeColorCreate(unogame.playing));
 	    }
 	    if(uno_packet->passingcard.number==14)
 	    {
+		    //unogame.playing=(unogame.playing+1)%unogame.player_No;
+            if (!change_order){
+                    	unogame.playing=(unogame.playing+1)%unogame.player_No;
+           	    }
+            	else{
+                    if(unogame.playing==0)
+                   	 {
+                        unogame.playing=unogame.player_No-1;
+                   	 }
+                    else{
+                        unogame.playing=(unogame.playing-1)%unogame.player_No;
+                   	 }
+                }
 		    cout<<unogame.playing<<"th player will get four cards!"<<endl;
 		    cout<<"Color will be changed "<<endl;
-		    m_socket[unogame.playing]->Send(DrawTwoCardPacketCreate(unogame.playing));
+		    m_socket[unogame.playing]->Send(DrawFourCardChangeColor(unogame.playing));
 	    }
 																
           break;
@@ -496,6 +580,19 @@ UnoServer::DrawCardPacketCreate(uint32_t uid)
     p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
     return p;
 }
+Ptr<Packet>
+UnoServer::ChangeOrder(uint32_t uid)
+{
+	Ptr<Packet> p;
+	UnoPacket up;
+	up.seq=seq_num++;
+	up.gameOp=GameOp::TURN;
+
+	up.uid=uid;
+	
+	p=Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
+	return p;
+}
 
 Ptr<Packet>
 UnoServer::BlockPacketCreate(uint32_t uid)
@@ -507,8 +604,6 @@ UnoServer::BlockPacketCreate(uint32_t uid)
 	up.gameOp=GameOp::PENALTY;
 
 	up.uid=uid;
-	up.passingcard.color=0;
-	up.passingcard.number=10;
 
 	p=Create<Packet>(reinterpret_cast<uint8_t*>(&up), sizeof(up));
 	return p;

@@ -180,43 +180,51 @@ UnoClient::Answer(Ptr<Packet> packet)
 
         //PENALTY
         case GameOp::PENALTY:
-	  if(uno_packet->passingcard.number==10)
-	  {
-		cout<<"---------You are blocked!!!---------"<<endl;
-		ret_packet=CreateReactionPacket(*uno_packet);
-	  }
-	  if(uno_packet->passingcard.number==12)
-	  {
-		cout<<"---------You will get two cards!!!---------"<<endl;
-	  	cout<<"Card List : "<<endl;
-		mycards.list.push_back(uno_packet->cards[0]);
-	  	mycards.list.push_back(uno_packet->cards[1]);
-	  	mycards.number+=2;
-		for(int i=0;i<int(mycards.number);i++){
-			printCard(mycards.list.at(i),i);
-		}
-		cout<<endl;
+	        if(uno_packet->passingcard.number==10)
+	        {
+		        cout<<endl;
+		        cout<<"---------You are blocked!!!---------"<<endl<<endl;
+		        ret_packet=CreateReactionPacket(*uno_packet);
+	        }
+	        if(uno_packet->passingcard.number==11)
+	        {
+		        cout<<endl;
+		        cout<<"------Order has changed. Your turn-------"<<endl<<endl;
+		        ret_packet=CreateReactionPacket(*uno_packet);
+	        }
+	        if(uno_packet->passingcard.number==12)
+	        {
+		        cout<<"---------You will get two cards!!!---------"<<endl;
+	  	      cout<<"Card List : "<<endl;
+		        mycards.list.push_back(uno_packet->cards[0]);
+	        	mycards.list.push_back(uno_packet->cards[1]);
+	  	      mycards.number+=2;
+		        for(int i=0;i<int(mycards.number);i++){
+			        printCard(mycards.list.at(i),i);
+		        }
+		        cout<<endl;
 
-		ret_packet=CreateReactionPacket(*uno_packet);
-	  }
-	  if(uno_packet->passingcard.number==14)
-	  {
-		cout<<"---------You will get four cards!!!-------"<<endl;
-                cout<<"Card List : "<<endl;
-		mycards.list.push_back(uno_packet->cards[0]);
-                mycards.list.push_back(uno_packet->cards[1]);
-		mycards.list.push_back(uno_packet->cards[2]);
-                mycards.list.push_back(uno_packet->cards[3]);
-                mycards.number+=4;
-                for(int i=0;i<int(mycards.number);i++){
-                        printCard(mycards.list.at(i),i);
-                }
-                cout<<endl;
+		        ret_packet=CreateReactionPacket(*uno_packet);
+	        }
+	        if(uno_packet->passingcard.number==14)
+	        {
+		        cout<<"---------You will get four cards!!!-------"<<endl;
+            cout<<"Card List : "<<endl;
+		        mycards.list.push_back(uno_packet->cards[0]);
+		        mycards.list.push_back(uno_packet->cards[1]);
+		        mycards.list.push_back(uno_packet->cards[2]);
+            mycards.list.push_back(uno_packet->cards[3]);
+                
+		        mycards.number+=4;
+            for(int i=0;i<int(mycards.number);i++){
+              printCard(mycards.list.at(i),i);
+            }
+            cout<<endl;
 
-		cout<<"The color is changed to "<<uno_packet->color<<endl;
+		        cout<<"The color is changed to "<<uno_packet->color<<endl;
 
-                ret_packet=CreateReactionPacket(*uno_packet);
-	  }
+            ret_packet=CreateReactionPacket(*uno_packet);
+	        }   
           break;
 
 
