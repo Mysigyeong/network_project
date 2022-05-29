@@ -339,11 +339,29 @@ void UnoServer::PacketRead(Ptr<Packet> packet)
         case GameOp::PENALTY:
 	    unogame.turn++;
             unogame.playing=(unogame.playing+1)%unogame.player_No;
+	    unogame.Collect_Trash(unogame.front);
+            unogame.front=uno_packet->passingcard;
+	    if(uno_packet->passingcard.number==10)
+	    {
+		    cout<<unogame.playing<<"th player will be blocked"<<endl;
+		    m_socket[unogame.playing]->Send(BlockPacketCreate(unogame.playing));
+	    }
 	    if(uno_packet->passingcard.number==12)
 	    {
 		    cout<<unogame.playing<<"th player will get two cards"<<endl;
 		    m_socket[unogame.playing]->Send(DrawTwoCardPacketCreate(unogame.playing));
                     //m_socket[unogame.playing]->Send(DrawCardPacketCreate(unogame.playing));
+	    }
+	    if(uno_packet->passingcard.number==13)
+	    {
+		    cout<<unogame.playing-1<<"th player changed color"<<endl;
+		    m_socket[unogame.playing]->Send(ChangeColorCreate(unogame.playing));
+	    }
+	    if(uno_packet->passingcard.number==14)
+	    {
+		    cout<<unogame.playing<<"th player will get four cards!"<<endl;
+		    cout<<"Color will be changed "<<endl;
+		    m_socket[unogame.playing]->Send(DrawTwoCardPacketCreate(unogame.playing));
 	    }
 																
           break;
@@ -480,6 +498,24 @@ UnoServer::DrawCardPacketCreate(uint32_t uid)
 }
 
 Ptr<Packet>
+UnoServer::BlockPacketCreate(uint32_t uid)
+{
+	Ptr<Packet> p;
+
+	UnoPacket up;
+	up.seq=seq_num++;
+	up.gameOp=GameOp::PENALTY;
+
+	up.uid=uid;
+	up.passingcard.color=0;
+	up.passingcard.number=10;
+
+	p=Create<Packet>(reinterpret_cast<uint8_t*>(&up), sizeof(up));
+	return p;
+}
+
+
+Ptr<Packet>
 UnoServer::DrawTwoCardPacketCreate(uint32_t uid)
 {
 	Ptr<Packet> p;
@@ -494,6 +530,48 @@ UnoServer::DrawTwoCardPacketCreate(uint32_t uid)
 
 	up.cards[0]=unogame.Draw();
 	up.cards[1]=unogame.Draw();
+	
+	p=Create<Packet>(reinterpret_cast<uint8_t*>(&up), sizeof(up));
+	return p;
+}
+
+Ptr<Packet>
+UnoServer::ChangeColorCreate(uint32_t uid)
+{
+	Ptr<Packet> p;
+
+        UnoPacket up;
+        up.seq=seq_num++;
+        up.gameOp=GameOp::TURN;
+
+        up.uid=uid;
+	up.color=rand()%4+1;
+        up.passingcard.color=0;
+        up.passingcard.number=13;
+
+        p=Create<Packet>(reinterpret_cast<uint8_t*>(&up), sizeof(up));
+        return p;
+}
+
+Ptr<Packet>
+UnoServer::DrawFourCardChangeColor(uint32_t uid)
+{
+	Ptr<Packet> p;
+
+	UnoPacket up;
+	up.seq=seq_num++;
+	up.gameOp=GameOp::PENALTY;
+
+	up.uid=uid;
+	up.color=rand()%4+1;
+	up.passingcard.color=0;
+	up.passingcard.number=14;
+
+	up.cards[0]=unogame.Draw();
+        up.cards[1]=unogame.Draw();
+	up.cards[2]=unogame.Draw();
+	up.cards[3]=unogame.Draw();
+
 
 	p=Create<Packet>(reinterpret_cast<uint8_t*>(&up), sizeof(up));
 	return p;

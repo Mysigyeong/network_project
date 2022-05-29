@@ -82,7 +82,10 @@ private:
   Ptr<Packet> DrawCardPacketCreate(uint32_t uid);
   Ptr<Packet> DrawTwoCardPacketCreate(uint32_t uid);
   Ptr<Packet> UnoEndPacketCreate(uint32_t uid);
+  Ptr<Packet> DrawFourCardChangeColor(uint32_t uid);
   Ptr<Packet> UnoUnoPacketCreate(uint32_t uid);
+  Ptr<Packet> ChangeColorCreate(uint32_t uid);
+  Ptr<Packet> BlockPacketCreate(uint32_t uid);
   void PacketRead(Ptr<Packet> packet);
   const char* goptostring(GameOp gop);
   const char* uoptostring(UserOp uop);
