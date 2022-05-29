@@ -328,19 +328,33 @@ UnoClient::CreateReactionPacket(UnoPacket recv_packet)
     
     if(recv_packet.gameOp==GameOp::TURN){
       bool  pass=false;
+      //penalty 여부
+      bool penalty=false;
       int   pass_index=0;
       //덱 위에 있는 카드가 스페셜 카드면 0번째 카드를 내려 놓는다.
       //규칙이 정확하지 않아서 이 부분은 special 맡으신 분이 체크 부탁드립니다.
-      if(deck_front.number>=10){
+      for(int i=0;i<int(mycards.list.size());i++)
+      {
+	      if(mycards.list.at(i).color==0)
+	      {
+		      up.passingcard=mycards.list.at(i);
+		      pass_index=i;
+		      penalty=true;
+		      break;
+	      }
+      }
+
+      /*if(deck_front.number>=10){
         up.passingcard=mycards.list.at(pass_index);
         pass_index=0;
         pass=true;
-      }
+      }*/
+
       //덱 위에 있는 카드가 스페셜 카드가 아니면, 손에 들고 있는 카드를 체크한다.
-      else{
+      if(!penalty){
         for(int i=0;i<int(mycards.list.size());i++){
           //발견시 해당 카드 내려 놓기
-          if(mycards.list.at(i).color == 0 || deck_front.color ==mycards.list.at(i).color || deck_front.number==mycards.list.at(i).number){
+          if(deck_front.color ==mycards.list.at(i).color || deck_front.number==mycards.list.at(i).number){
             pass_index=i;
             pass=true;
             up.passingcard=mycards.list.at(i);
@@ -354,18 +368,38 @@ UnoClient::CreateReactionPacket(UnoPacket recv_packet)
         mycards.number=mycards.list.size();
         //UserOp는 Play
         up.userOp=UserOp::PLAY;
-      }else{
+	up.gameOp=GameOp::TURN;
+      }
+      else if(penalty)
+      {
+	      mycards.list.erase(mycards.list.begin()+pass_index);
+	      mycards.number=mycards.list.size();
+	      up.userOp=UserOp::PLAY;
+	      up.gameOp=GameOp::PENALTY;
+      }
+      else{
         //UserOp는 Draw
         up.userOp=UserOp::DRAW;
+	up.gameOp=GameOp::DRAW;
       }
       up.seq=recv_packet.seq;
       up.uid=recv_packet.uid;
-      up.gameOp=recv_packet.gameOp;
+      //up.gameOp=recv_packet.gameOp;
       up.numOfCards=mycards.number;
-      pass ?
-        cout<<"Action : PLAY, Card : "<<"("<<up.passingcard.color<<","<<up.passingcard.number<<")"<<endl
-          :
-        cout<<"Action : Draw"<<endl;;
+
+      if(penalty)
+      {
+	      cout<<"Action : PLAY, Card : "<<"("<<up.passingcard.color<<","<<up.passingcard.number<<")"<<endl;
+	      cout<<"Next player will get penalty"<<endl;
+      }
+      else if(pass)
+      {
+	      cout<<"Action : PLAY, Card : "<<"("<<up.passingcard.color<<","<<up.passingcard.number<<")"<<endl;
+      }
+      else
+      {
+	      cout<<"Action : Draw"<<endl;
+      }
     }
 
     //turn이 아닐 경우 구현

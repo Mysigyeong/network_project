@@ -31,7 +31,10 @@ namespace ns3 {
 
 class Socket;
 class Packet;
-
+struct InHandCards{
+  uint32_t number;
+  vector<card> list;
+};
 /**
  * \ingroup applications 
  * \defgroup udpecho UdpEcho
@@ -46,6 +49,7 @@ class Packet;
 class UnoClient : public Application 
 {
 public:
+  InHandCards mycards;
   /**
    * \brief Get the type ID.
    * \return the object TypeId
@@ -70,13 +74,19 @@ private:
    * \param socket the socket the packet was received to.
    */
   void HandleRead (Ptr<Socket> socket);
+  const char* goptostring(GameOp gop);
   Ptr<Packet> Answer(Ptr<Packet> packet);
+  Ptr<Packet> CreateReactionPacket(UnoPacket recv_packet);
+  void printCard (card card, int index);
   uint16_t m_port; //!< Port on which we listen for incoming packets.
   Ptr<Socket> m_socket; //!< IPv4 Socket
   Address m_local; //!< local multicast address
 };
 
+
 } // namespace ns3
+
+
 
 #endif /* UNO_CLIENT_H */
 

@@ -13,10 +13,10 @@ CCLNK_TGT_F = ['-o']
 CC_NAME = 'gcc'
 CC_SRC_F = []
 CC_TGT_F = ['-c', '-o']
-CC_VERSION = ('7', '5', '0')
+CC_VERSION = ('9', '4', '0')
 CFLAGS_MACBUNDLE = ['-fPIC']
-CFLAGS_PYEMBED = ['-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-gnDdqE/python2.7-2.7.17=.', '-fstack-protector-strong', '-fno-strict-aliasing']
-CFLAGS_PYEXT = ['-pthread', '-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-gnDdqE/python2.7-2.7.17=.', '-fstack-protector-strong', '-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-gnDdqE/python2.7-2.7.17=.', '-fstack-protector-strong', '-fno-strict-aliasing']
+CFLAGS_PYEMBED = ['-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-QDqKfA/python2.7-2.7.18=.', '-fstack-protector-strong', '-fno-strict-aliasing']
+CFLAGS_PYEXT = ['-pthread', '-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-QDqKfA/python2.7-2.7.18=.', '-fstack-protector-strong', '-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-QDqKfA/python2.7-2.7.18=.', '-fstack-protector-strong', '-fno-strict-aliasing']
 CFLAGS_cshlib = ['-fPIC']
 COMPILER_CC = 'gcc'
 COMPILER_CXX = 'g++'
@@ -26,8 +26,8 @@ CXXDEFINES = ['_DEBUG']
 CXXFLAGS = ['-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-std=c++11', '-fstrict-aliasing', '-Wstrict-aliasing']
 CXXFLAGS_MACBUNDLE = ['-fPIC']
 CXXFLAGS_PTHREAD = '-pthread'
-CXXFLAGS_PYEMBED = ['-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-gnDdqE/python2.7-2.7.17=.', '-fstack-protector-strong', '-fno-strict-aliasing']
-CXXFLAGS_PYEXT = ['-pthread', '-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-gnDdqE/python2.7-2.7.17=.', '-fstack-protector-strong', '-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-gnDdqE/python2.7-2.7.17=.', '-fstack-protector-strong', '-fno-strict-aliasing']
+CXXFLAGS_PYEMBED = ['-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-QDqKfA/python2.7-2.7.18=.', '-fstack-protector-strong', '-fno-strict-aliasing']
+CXXFLAGS_PYEXT = ['-pthread', '-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-QDqKfA/python2.7-2.7.18=.', '-fstack-protector-strong', '-fno-strict-aliasing', '-g', '-fwrapv', '-O2', '-g', '-fdebug-prefix-map=/build/python2.7-QDqKfA/python2.7-2.7.18=.', '-fstack-protector-strong', '-fno-strict-aliasing']
 CXXFLAGS_cxxshlib = ['-fPIC']
 CXXLNK_SRC_F = []
 CXXLNK_TGT_F = ['-o']
@@ -48,7 +48,7 @@ DOCDIR = '/usr/local/share/doc/ns'
 DVIDIR = '/usr/local/share/doc/ns'
 ENABLE_BRITE = False
 ENABLE_EMU = True
-ENABLE_EXAMPLES = False
+ENABLE_EXAMPLES = True
 ENABLE_FDNETDEV = True
 ENABLE_GSL = None
 ENABLE_GTK = None
@@ -60,7 +60,7 @@ ENABLE_REAL_TIME = True
 ENABLE_STATIC_NS3 = False
 ENABLE_SUDO = False
 ENABLE_TAP = True
-ENABLE_TESTS = False
+ENABLE_TESTS = True
 ENABLE_THREADING = True
 EXAMPLE_DIRECTORIES = ['udp-client-server', 'tcp', 'matrix-topology', 'stats', 'udp', 'routing', 'energy', 'naming', 'realtime', 'socket', 'error-model', 'ipv6', 'tutorial', 'wireless', 'traffic-control']
 EXEC_PREFIX = '/usr/local'
@@ -110,10 +110,10 @@ MODULES_NOT_BUILT = ['brite', 'click', 'openflow', 'visualizer']
 NS3_CONTRIBUTED_MODULES = []
 NS3_ENABLED_CONTRIBUTED_MODULES = []
 NS3_ENABLED_MODULES = ['ns3-antenna', 'ns3-aodv', 'ns3-applications', 'ns3-bridge', 'ns3-buildings', 'ns3-config-store', 'ns3-core', 'ns3-csma', 'ns3-csma-layout', 'ns3-dsdv', 'ns3-dsr', 'ns3-energy', 'ns3-fd-net-device', 'ns3-flow-monitor', 'ns3-internet', 'ns3-internet-apps', 'ns3-lr-wpan', 'ns3-lte', 'ns3-mesh', 'ns3-mobility', 'ns3-mpi', 'ns3-netanim', 'ns3-network', 'ns3-nix-vector-routing', 'ns3-olsr', 'ns3-point-to-point', 'ns3-point-to-point-layout', 'ns3-propagation', 'ns3-sixlowpan', 'ns3-spectrum', 'ns3-stats', 'ns3-tap-bridge', 'ns3-test', 'ns3-topology-read', 'ns3-traffic-control', 'ns3-uan', 'ns3-virtual-net-device', 'ns3-wave', 'ns3-wifi', 'ns3-wimax']
-NS3_EXECUTABLE_PATH = ['/root/ns-allinone-3.29/ns-3.29/build/src/fd-net-device', '/root/ns-allinone-3.29/ns-3.29/build/src/tap-bridge']
+NS3_EXECUTABLE_PATH = ['/home/luna/networkproj/network_project/ns-3.29/build/src/fd-net-device', '/home/luna/networkproj/network_project/ns-3.29/build/src/tap-bridge']
 NS3_MODULES = ['ns3-antenna', 'ns3-aodv', 'ns3-applications', 'ns3-bridge', 'ns3-buildings', 'ns3-config-store', 'ns3-core', 'ns3-csma', 'ns3-csma-layout', 'ns3-dsdv', 'ns3-dsr', 'ns3-energy', 'ns3-fd-net-device', 'ns3-flow-monitor', 'ns3-internet', 'ns3-internet-apps', 'ns3-lr-wpan', 'ns3-lte', 'ns3-mesh', 'ns3-mobility', 'ns3-mpi', 'ns3-netanim', 'ns3-network', 'ns3-nix-vector-routing', 'ns3-olsr', 'ns3-point-to-point', 'ns3-point-to-point-layout', 'ns3-propagation', 'ns3-sixlowpan', 'ns3-spectrum', 'ns3-stats', 'ns3-tap-bridge', 'ns3-test', 'ns3-topology-read', 'ns3-traffic-control', 'ns3-uan', 'ns3-virtual-net-device', 'ns3-wave', 'ns3-wifi', 'ns3-wimax']
-NS3_MODULE_PATH = ['/usr/lib/gcc/x86_64-linux-gnu/7', '/root/ns-allinone-3.29/ns-3.29/build/lib']
-NS3_OPTIONAL_FEATURES = [('python', 'Python Bindings', False, 'Python library or headers missing'), ('brite', 'BRITE Integration', False, 'BRITE not enabled (see option --with-brite)'), ('nsclick', 'NS-3 Click Integration', False, 'nsclick not enabled (see option --with-nsclick)'), ('GtkConfigStore', 'GtkConfigStore', [], "library 'gtk+-3.0 >= 3.0' not found"), ('XmlIo', 'XmlIo', [], "library 'libxml-2.0 >= 2.7' not found"), ('Threading', 'Threading Primitives', True, '<pthread.h> include not detected'), ('RealTime', 'Real Time Simulator', True, 'threading not enabled'), ('FdNetDevice', 'File descriptor NetDevice', True, 'FdNetDevice module enabled'), ('TapFdNetDevice', 'Tap FdNetDevice', True, 'Tap support enabled'), ('EmuFdNetDevice', 'Emulation FdNetDevice', True, 'Emulation support enabled'), ('PlanetLabFdNetDevice', 'PlanetLab FdNetDevice', False, 'PlanetLab operating system not detected (see option --force-planetlab)'), ('nsc', 'Network Simulation Cradle', False, 'NSC not found (see option --with-nsc)'), ('mpi', 'MPI Support', False, 'option --enable-mpi not selected'), ('openflow', 'NS-3 OpenFlow Integration', False, 'Required boost libraries not found'), ('SqliteDataOutput', 'SQlite stats data output', [], "library 'sqlite3' not found"), ('TapBridge', 'Tap Bridge', True, '<linux/if_tun.h> include not detected'), ('PyViz', 'PyViz visualizer', False, 'Python Bindings are needed but not enabled'), ('ENABLE_SUDO', 'Use sudo to set suid bit', False, 'option --enable-sudo not selected'), ('ENABLE_TESTS', 'Tests', False, 'defaults to disabled'), ('ENABLE_EXAMPLES', 'Examples', False, 'defaults to disabled'), ('GSL', 'GNU Scientific Library (GSL)', [], 'GSL not found'), ('libgcrypt', 'Gcrypt library', [], 'libgcrypt not found: you can use libgcrypt-config to find its location.'), ('DES Metrics', 'DES Metrics event collection', [], 'defaults to disabled')]
+NS3_MODULE_PATH = ['/usr/lib/gcc/x86_64-linux-gnu/9', '/home/luna/networkproj/network_project/ns-3.29/build/lib']
+NS3_OPTIONAL_FEATURES = [('python', 'Python Bindings', False, 'Python library or headers missing'), ('brite', 'BRITE Integration', False, 'BRITE not enabled (see option --with-brite)'), ('nsclick', 'NS-3 Click Integration', False, 'nsclick not enabled (see option --with-nsclick)'), ('GtkConfigStore', 'GtkConfigStore', [], "library 'gtk+-3.0 >= 3.0' not found"), ('XmlIo', 'XmlIo', [], "library 'libxml-2.0 >= 2.7' not found"), ('Threading', 'Threading Primitives', True, '<pthread.h> include not detected'), ('RealTime', 'Real Time Simulator', True, 'threading not enabled'), ('FdNetDevice', 'File descriptor NetDevice', True, 'FdNetDevice module enabled'), ('TapFdNetDevice', 'Tap FdNetDevice', True, 'Tap support enabled'), ('EmuFdNetDevice', 'Emulation FdNetDevice', True, 'Emulation support enabled'), ('PlanetLabFdNetDevice', 'PlanetLab FdNetDevice', False, 'PlanetLab operating system not detected (see option --force-planetlab)'), ('nsc', 'Network Simulation Cradle', False, 'NSC not found (see option --with-nsc)'), ('mpi', 'MPI Support', False, 'option --enable-mpi not selected'), ('openflow', 'NS-3 OpenFlow Integration', False, 'Required boost libraries not found'), ('SqliteDataOutput', 'SQlite stats data output', [], "library 'sqlite3' not found"), ('TapBridge', 'Tap Bridge', True, '<linux/if_tun.h> include not detected'), ('PyViz', 'PyViz visualizer', False, 'Python Bindings are needed but not enabled'), ('ENABLE_SUDO', 'Use sudo to set suid bit', False, 'option --enable-sudo not selected'), ('ENABLE_TESTS', 'Tests', True, 'option --enable-tests selected'), ('ENABLE_EXAMPLES', 'Examples', True, 'option --enable-examples selected'), ('GSL', 'GNU Scientific Library (GSL)', [], 'GSL not found'), ('libgcrypt', 'Gcrypt library', [], 'libgcrypt not found: you can use libgcrypt-config to find its location.'), ('DES Metrics', 'DES Metrics event collection', [], 'defaults to disabled')]
 OLDINCLUDEDIR = '/usr/include'
 PACKAGE = 'ns'
 PDFDIR = '/usr/local/share/doc/ns'
@@ -139,11 +139,12 @@ SQLITE_STATS = None
 STLIBPATH_ST = '-L%s'
 STLIB_MARKER = '-Wl,-Bstatic'
 STLIB_ST = '-l%s'
+SUDO = ['/usr/bin/sudo']
 SYSCONFDIR = '/usr/local/etc'
 VALGRIND_FOUND = False
 VERSION = '3.29'
 WL_SONAME_SUPPORTED = True
-cfg_files = ['/root/ns-allinone-3.29/ns-3.29/build/ns3/config-store-config.h', '/root/ns-allinone-3.29/ns-3.29/build/ns3/core-config.h']
+cfg_files = ['/home/luna/networkproj/network_project/ns-3.29/build/ns3/config-store-config.h', '/home/luna/networkproj/network_project/ns-3.29/build/ns3/core-config.h']
 cprogram_PATTERN = '%s'
 cshlib_PATTERN = 'lib%s.so'
 cstlib_PATTERN = 'lib%s.a'
