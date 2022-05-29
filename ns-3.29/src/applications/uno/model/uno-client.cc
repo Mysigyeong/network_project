@@ -185,12 +185,14 @@ UnoClient::Answer(Ptr<Packet> packet)
 	        {
 		        cout<<endl;
 		        cout<<"---------You are blocked!!!---------"<<endl<<endl;
+            cout<<"Front Card : "<<"("<<uno_packet->frontcard.color<<","<<uno_packet->frontcard.number<<")"<<endl;
 		        ret_packet=CreateReactionPacket(*uno_packet);
 	        }
 	        if(uno_packet->passingcard.number==11)
 	        {
 		        cout<<endl;
 		        cout<<"------Order has changed. Your turn-------"<<endl<<endl;
+            cout<<"Front Card : "<<"("<<uno_packet->frontcard.color<<","<<uno_packet->frontcard.number<<")"<<endl;
 		        ret_packet=CreateReactionPacket(*uno_packet);
 	        }
 	        if(uno_packet->passingcard.number==12)
@@ -427,7 +429,7 @@ UnoClient::CreateReactionPacket(UnoPacket recv_packet)
       else{
         //UserOp는 Draw
         up.userOp=UserOp::DRAW;
-	up.gameOp=GameOp::DRAW;
+	      up.gameOp=GameOp::TURN;
       }
       up.seq=recv_packet.seq;
       up.uid=recv_packet.uid;
@@ -472,19 +474,42 @@ UnoClient::CreateReactionPacket(UnoPacket recv_packet)
         up.uid=recv_packet.uid;
         up.seq=recv_packet.seq;
       }
-      if(recv_packet.gameOp==GameOp::PENALTY){
+      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==14){
 	      up.numOfCards=mycards.number;
+        up.userOp=UserOp::DEFAULT;
 	      up.gameOp=GameOp::TURN;
+	      up.uid=recv_packet.uid;
+	      up.seq=recv_packet.seq;
+      }
+      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==12){
+	      up.numOfCards=mycards.number;
+        up.userOp=UserOp::DEFAULT;
+	      up.gameOp=GameOp::TURN;
+	      up.uid=recv_packet.uid;
+	      up.seq=recv_packet.seq;
+      }
+      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==10){
+	      up.numOfCards=mycards.number;
+        up.gameOp=GameOp::TURN;
+	      up.uid=recv_packet.uid;
+	      up.seq=recv_packet.seq;
+      }
+      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==11){
+	      up.numOfCards=mycards.number;
+        up.userOp=UserOp::DEFAULT;
+	      up.gameOp=GameOp::DEFAULT;
+	      up.uid=recv_packet.uid;
+	      up.seq=recv_packet.seq;
+      }
+      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==13){
+	      up.numOfCards=mycards.number;
+        up.userOp=UserOp::DEFAULT;
+	      up.gameOp=GameOp::DEFAULT;
 	      up.uid=recv_packet.uid;
 	      up.seq=recv_packet.seq;
       }
 
     }
-
-
-
-
-
 
     p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
     

@@ -594,6 +594,9 @@ UnoServer::ChangeOrder(uint32_t uid)
 	up.seq=seq_num++;
 	up.gameOp=GameOp::TURN;
 
+    up.frontcard.number=unogame.front.number;
+    up.frontcard.color=unogame.front.color;
+
 	up.uid=uid;
 	
 	p=Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
@@ -608,6 +611,11 @@ UnoServer::BlockPacketCreate(uint32_t uid)
 	UnoPacket up;
 	up.seq=seq_num++;
 	up.gameOp=GameOp::PENALTY;
+    up.passingcard.color=0;
+	up.passingcard.number=10;
+
+    up.frontcard.number=unogame.front.number;
+    up.frontcard.color=unogame.front.color;
 
 	up.uid=uid;
 
@@ -629,6 +637,9 @@ UnoServer::DrawTwoCardPacketCreate(uint32_t uid)
 	up.passingcard.color=0;
 	up.passingcard.number=12;
 
+    up.frontcard.number=unogame.front.number;
+    up.frontcard.color=unogame.front.color;
+
 	up.cards[0]=unogame.Draw();
 	up.cards[1]=unogame.Draw();
 	
@@ -646,7 +657,7 @@ UnoServer::ChangeColorCreate(uint32_t uid)
         up.gameOp=GameOp::TURN;
 
         up.uid=uid;
-	up.color=rand()%4+1;
+	    up.color=rand()%4+1;
         up.passingcard.color=0;
         up.passingcard.number=13;
 
@@ -668,8 +679,11 @@ UnoServer::DrawFourCardChangeColor(uint32_t uid)
 	up.passingcard.color=0;
 	up.passingcard.number=14;
 
+    up.frontcard.number=unogame.front.number;
+    up.frontcard.color=unogame.front.color;
+
 	up.cards[0]=unogame.Draw();
-        up.cards[1]=unogame.Draw();
+    up.cards[1]=unogame.Draw();
 	up.cards[2]=unogame.Draw();
 	up.cards[3]=unogame.Draw();
 

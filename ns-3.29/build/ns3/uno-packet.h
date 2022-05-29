@@ -11,13 +11,15 @@ enum class GameOp : uint32_t
     UNO,      // Users have to say uno
     GAMEOVER, // Gameover
     WAIT,   // Wait your Turn
+    DEFAULT,
 };
 
 enum class UserOp : uint32_t
 {
     PLAY,     // Play a card
     DRAW,     // Draw a card; the user cannot play a card
-    UNO       // Say uno
+    UNO,       // Say uno
+    DEFAULT,
 };
 
 
