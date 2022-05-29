@@ -80,6 +80,7 @@ private:
   void InitUno(uint32_t num);
   Ptr<Packet> UnoPacketCreate(uint32_t uid);
   Ptr<Packet> DrawCardPacketCreate(uint32_t uid);
+  Ptr<Packet> DrawTwoCardPacketCreate(uint32_t uid);
   Ptr<Packet> UnoEndPacketCreate(uint32_t uid);
   Ptr<Packet> UnoUnoPacketCreate(uint32_t uid);
   void PacketRead(Ptr<Packet> packet);

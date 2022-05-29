@@ -239,6 +239,7 @@ UnoServer::Send (uint32_t clientIdx)
 
     if (InetSocketAddress::IsMatchingType (m_clientAddress[clientIdx]))
     {
+	cout<<"-----------------------------------------------------------"<<endl;
         NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server sent " << sizeof(unoPacket) << " bytes to client "
                      << clientIdx + 1 << " " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetIpv4 ()
                      << " port " << InetSocketAddress::ConvertFrom (m_clientAddress[clientIdx]).GetPort ()<<endl<<endl);
@@ -336,6 +337,15 @@ void UnoServer::PacketRead(Ptr<Packet> packet)
             break;
         //PENALTY
         case GameOp::PENALTY:
+	    unogame.turn++;
+            unogame.playing=(unogame.playing+1)%unogame.player_No;
+	    if(uno_packet->passingcard.number==12)
+	    {
+		    cout<<unogame.playing<<"th player will get two cards"<<endl;
+		    m_socket[unogame.playing]->Send(DrawTwoCardPacketCreate(unogame.playing));
+                    //m_socket[unogame.playing]->Send(DrawCardPacketCreate(unogame.playing));
+	    }
+																
           break;
 
         //UNO
@@ -467,6 +477,26 @@ UnoServer::DrawCardPacketCreate(uint32_t uid)
 
     p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));
     return p;
+}
+
+Ptr<Packet>
+UnoServer::DrawTwoCardPacketCreate(uint32_t uid)
+{
+	Ptr<Packet> p;
+
+	UnoPacket up;
+	up.seq=seq_num++;
+	up.gameOp=GameOp::PENALTY;
+
+	up.uid=uid;
+	up.passingcard.color=0;
+	up.passingcard.number=12;
+
+	up.cards[0]=unogame.Draw();
+	up.cards[1]=unogame.Draw();
+
+	p=Create<Packet>(reinterpret_cast<uint8_t*>(&up), sizeof(up));
+	return p;
 }
 
 void
