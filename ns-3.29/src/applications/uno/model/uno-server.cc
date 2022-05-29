@@ -250,7 +250,13 @@ UnoServer::Send (uint32_t clientIdx)
         m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx + 1) % m_numOfSocket);
     }
     if(!stopbroadcast && change_order){
-	    m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx - 1) % m_numOfSocket);
+        if(clientIdx==0){
+            m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, m_numOfSocket-1);
+        }
+        else{
+            m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, (clientIdx - 1) % m_numOfSocket);
+        }
+	    
     }
 }
 

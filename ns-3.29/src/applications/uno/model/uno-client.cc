@@ -177,6 +177,7 @@ UnoClient::Answer(Ptr<Packet> packet)
           cout<<endl;
 
           ret_packet=CreateReactionPacket(*uno_packet);
+          break;
 
         //PENALTY
         case GameOp::PENALTY:
