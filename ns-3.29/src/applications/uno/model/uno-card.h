@@ -13,13 +13,14 @@ using namespace std;
 
 //Normal card
 //color=1,2,3,4, number=0,1,2,3,4,5,6,7,8,9
+#define SPECIAL 0
 #define RED 1
 #define YELLOW 2
 #define BLUE 3
 #define GREEN 4
 
 //special card
-//color=0,  number=10,11,12
+//color=1,2,3,4,  number=10,11,12
 #define SKIP 10     //다음 턴 사람 넘기고 그 다음사람으로 ㄱ
 #define REVERSE 11  //순서 바뀜
 #define DRAW_TWO 12 // 다음 턴 사람 두장 먹고 다음 사람으로 턴 넘김

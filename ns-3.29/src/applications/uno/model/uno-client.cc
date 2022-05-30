@@ -150,7 +150,7 @@ UnoClient::Answer(Ptr<Packet> packet)
             }
             cout<<endl;
 
-            cout<<"You ready to play?" << endl;
+            cout<<"Are you ready to play?" << endl;
             ret_packet=packet;
             break;
 
@@ -317,19 +317,19 @@ UnoClient::printCard(card card, int index)
 {
   switch(card.color)
   {
-      case 0:
+      case SPECIAL:
           cout<<"(Special, ";
           break;
-      case 1:
+      case RED:
           cout<<"(Red, ";
           break;
-      case 2:
+      case YELLOW:
           cout<<"(Yellow, ";
           break;
-      case 3:
+      case BLUE:
           cout<<"(Blue, ";
           break;
-      case 4:
+      case GREEN:
           cout<<"(Green, ";
           break;
       default:
@@ -341,19 +341,19 @@ UnoClient::printCard(card card, int index)
   {
       switch(card.number)
       {
-          case 10:
+          case SKIP:
               cout<<"Skip) ";
               break;
-          case 11:
+          case REVERSE:
               cout<<"Reverse) ";
               break;
-          case 12:
+          case DRAW_TWO:
               cout<<"Draw Two) ";
               break;
-          case 13:
+          case WILD:
               cout<<"Wild) ";
               break;
-          case 14:
+          case WILD_DRAW_FOUR:
               cout<<"Wild & Draw Four) ";
               break;
           default:
