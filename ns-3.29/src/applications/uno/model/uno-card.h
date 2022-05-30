@@ -39,6 +39,7 @@ class Uno{
     public:
 
     card front;  //현재 맨위의 카드
+    uint32_t color; // selected color; wildcard
     uint32_t turn; // 턴 수
     uint32_t playing; //현재 차례인 player
     uint32_t player_No; //player 수

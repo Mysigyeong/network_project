@@ -64,7 +64,6 @@ private:
    * \brief Send a packet to clientIdx
    */
   void Send (uint32_t clientIdx);
-  void Send2 (uint32_t clientIdx);
   /**
    * \brief Handle a packet reception.
    *
@@ -73,23 +72,21 @@ private:
    * \param socket the socket the packet was received to.
    */
   void HandleRead (Ptr<Socket> socket);
-
+  void ChangingTurn (void);
+  const char* PrintColor (uint32_t color);
+  void HandleCardEffect (void);
 
   uint32_t m_numOfSocket; //!< Number of socket ; max 10
   Ptr<Socket> m_socket[10]; //!< Socket
   void InitUno(uint32_t num);
   Ptr<Packet> UnoPacketCreate(uint32_t uid);
-  Ptr<Packet> DrawCardPacketCreate(uint32_t uid);
-  Ptr<Packet> DrawTwoCardPacketCreate(uint32_t uid);
+  Ptr<Packet> DrawCardPacketCreate(uint32_t uid, uint32_t num, bool unoDraw);
   Ptr<Packet> UnoEndPacketCreate(uint32_t uid);
-  Ptr<Packet> DrawFourCardChangeColor(uint32_t uid);
   Ptr<Packet> UnoUnoPacketCreate(uint32_t uid);
-  Ptr<Packet> ChangeColorCreate(uint32_t uid);
-  Ptr<Packet> BlockPacketCreate(uint32_t uid);
-  Ptr<Packet> ChangeOrder(uint32_t uid);
   void PacketRead(Ptr<Packet> packet);
   const char* goptostring(GameOp gop);
   const char* uoptostring(UserOp uop);
+
   Address m_clientAddress[10]; //!< Remote peer address
   Address m_clientAddress1;
   Address m_clientAddress2;

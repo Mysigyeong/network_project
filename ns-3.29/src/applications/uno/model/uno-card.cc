@@ -21,16 +21,17 @@ using namespace std;
 using namespace ns3;
 Uno::Uno()
 {
-    turn=0;
-    playing=0;
-    player_No=0;
+    turn = 0;
+    playing = 0;
+    player_No = 0;
+    color = 1;
 
     
-    for(uint32_t color = 1; color < 5; color++)
+    for(uint32_t temp_color = 1; temp_color < 5; temp_color++)
     {
         //0번 카드는 색당 1장씩
         card c;
-        c.color = color;
+        c.color = temp_color;
         c.number = 0;
         deck.push_back(c);
 
@@ -38,8 +39,8 @@ Uno::Uno()
         for(uint32_t j = 1; j < 13; j++)
         {
             card c1, c2;
-            c1.color = color; c1.number = j;
-            c2.color = color; c2.number = j;
+            c1.color = temp_color; c1.number = j;
+            c2.color = temp_color; c2.number = j;
             deck.push_back(c1);
             deck.push_back(c2);
         }
@@ -49,8 +50,8 @@ Uno::Uno()
     for(uint32_t j=0; j<4; j++)
     {
         card c1,c2;
-        c1.color=0; c2.number=WILD;
-        c2.color=0; c2.number=WILD_DRAW_FOUR;
+        c1.color=SPECIAL; c1.number=WILD;
+        c2.color=SPECIAL; c2.number=WILD_DRAW_FOUR;
         deck.push_back(c1);
         deck.push_back(c2);
     }
