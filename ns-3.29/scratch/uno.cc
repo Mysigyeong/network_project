@@ -84,17 +84,17 @@ int main(int argc, char* argv[])
     for (uint32_t i = 0; i < num_client; i++) {
         client[i] = unoclienthelper.Install(terminals.Get(i));
         client[i].Start(Seconds(1.0));
-        client[i].Stop(Seconds(30.0));
+        client[i].Stop(Seconds(999.0));
     }
     
     // Install server
     UnoServerHelper unoserverhelper(num_client, ClientAddressList);
     ApplicationContainer server = unoserverhelper.Install(terminals.Get(num_terminals-1));
     server.Start(Seconds(1.0));
-    server.Stop(Seconds(30.0));
+    server.Stop(Seconds(999.0));
     
 
-    Simulator::Stop(Seconds(35));
+    Simulator::Stop(Seconds(1000));
     Simulator::Run();
     Simulator::Destroy();
 }

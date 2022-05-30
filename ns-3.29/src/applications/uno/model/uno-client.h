@@ -73,11 +73,12 @@ private:
    *
    * \param socket the socket the packet was received to.
    */
+  const char* PrintColor (uint32_t color);
   void HandleRead (Ptr<Socket> socket);
   const char* goptostring(GameOp gop);
   Ptr<Packet> Answer(Ptr<Packet> packet);
   Ptr<Packet> CreateReactionPacket(UnoPacket recv_packet);
-  void printCard (card card, int index);
+  void printCard (card card);
   uint16_t m_port; //!< Port on which we listen for incoming packets.
   Ptr<Socket> m_socket; //!< IPv4 Socket
   Address m_local; //!< local multicast address

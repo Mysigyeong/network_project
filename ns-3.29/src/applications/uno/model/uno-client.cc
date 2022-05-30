@@ -120,6 +120,25 @@ UnoClient::StopApplication ()
     }
 }
 
+const char*
+UnoClient::PrintColor (uint32_t color)
+{
+    switch (color) {
+        case SPECIAL:
+        return "special";
+        case RED:
+        return "red";
+        case YELLOW:
+        return "yellow";
+        case BLUE:
+        return "blue";
+        case GREEN:
+        return "green";
+        default:
+        return "invalid";
+    }
+}
+
 Ptr<Packet>
 UnoClient::Answer(Ptr<Packet> packet)
 {
@@ -142,119 +161,67 @@ UnoClient::Answer(Ptr<Packet> packet)
       
       switch(uno_packet->gameOp){
         case GameOp::INIT:
-            cout<<"First Draw"<<endl;
-            mycards.number=uno_packet->numOfCards;
-            for(int i=0;i<int(uno_packet->numOfCards);i++){
-              mycards.list.push_back(uno_packet->cards[i]);
-              printCard(mycards.list.at(i), i);              
-            }
-            cout<<endl;
+        cout<<"First Draw"<<endl;
+        mycards.number=uno_packet->numOfCards;
+        for(int i=0;i<int(uno_packet->numOfCards);i++){
+          mycards.list.push_back(uno_packet->cards[i]);
+          printCard(mycards.list.at(i));              
+        }
+        cout<<endl;
 
-            cout<<"You ready to play?" << endl;
-            ret_packet=packet;
-            break;
+        cout<<"Are you ready to play?" << endl;
+        ret_packet=packet;
+        break;
 
         //Turn
         case GameOp::TURN:
-          cout<<"Card List : "<<endl;
-          for(int i=0;i<int(mycards.list.size());i++){
-              printCard(mycards.list.at(i), i);              
-          }
-          cout<<endl;
+        cout<<"Card List : "<<endl;
+        for(int i=0;i<int(mycards.list.size());i++){
+            printCard(mycards.list.at(i));              
+        }
+        cout<<endl;
 
-          cout<<"Front Card : "<<"("<<uno_packet->frontcard.color<<","<<uno_packet->frontcard.number<<")"<<endl;
-          ret_packet=CreateReactionPacket(*uno_packet);
-          break;
+        cout<<"Front Card : ";
+        printCard(uno_packet->frontcard);
+        cout<<endl;
 
+        if (uno_packet->frontcard.color == SPECIAL) {
+          cout << "Previous player selected " << PrintColor(uno_packet->color) << endl;
+        }
+
+        ret_packet=CreateReactionPacket(*uno_packet);
+        break;
+
+        case GameOp::UNODRAW:
         case GameOp::DRAW:
-          cout<<"----------Draw New Card----------"<<endl;
-          cout<<"Card List : "<<endl;
-          mycards.list.push_back(uno_packet->passingcard);
+        cout<<"----------Draw Card----------"<<endl;
+        cout<<"Card List : "<<endl;
+        for (uint32_t i = 0; i < uno_packet->numOfCards; i++) {
+          mycards.list.push_back(uno_packet->cards[i]);
           mycards.number++;
-          for(int i=0;i<int(mycards.number);i++){
-              printCard(mycards.list.at(i), i);              
-          }
-          cout<<endl;
+        }
+        for(int i=0;i<int(mycards.number);i++){
+            printCard(mycards.list.at(i));              
+        }
+        cout<<endl;
 
-          ret_packet=CreateReactionPacket(*uno_packet);
-          break;
-
-        //PENALTY
-        case GameOp::PENALTY:
-	        if(uno_packet->passingcard.number==10)
-	        {
-		        cout<<endl;
-		        cout<<"---------You are blocked!!!---------"<<endl<<endl;
-            cout<<"Front Card : "<<"("<<uno_packet->frontcard.color<<","<<uno_packet->frontcard.number<<")"<<endl;
-		        ret_packet=CreateReactionPacket(*uno_packet);
-	        }
-	        if(uno_packet->passingcard.number==11)
-	        {
-		        cout<<endl;
-		        cout<<"------Order has changed. Your turn-------"<<endl<<endl;
-            cout<<"Front Card : "<<"("<<uno_packet->frontcard.color<<","<<uno_packet->frontcard.number<<")"<<endl;
-		        ret_packet=CreateReactionPacket(*uno_packet);
-	        }
-	        if(uno_packet->passingcard.number==12)
-	        {
-		        cout<<"---------You will get two cards!!!---------"<<endl;
-	  	      cout<<"Card List : "<<endl;
-		        mycards.list.push_back(uno_packet->cards[0]);
-	        	mycards.list.push_back(uno_packet->cards[1]);
-	  	      mycards.number+=2;
-		        for(int i=0;i<int(mycards.number);i++){
-			        printCard(mycards.list.at(i),i);
-		        }
-		        cout<<endl;
-
-		        ret_packet=CreateReactionPacket(*uno_packet);
-	        }
-	        if(uno_packet->passingcard.number==14)
-	        {
-		        cout<<"---------You will get four cards!!!-------"<<endl;
-            cout<<"Card List : "<<endl;
-		        mycards.list.push_back(uno_packet->cards[0]);
-		        mycards.list.push_back(uno_packet->cards[1]);
-		        mycards.list.push_back(uno_packet->cards[2]);
-            mycards.list.push_back(uno_packet->cards[3]);
-                
-		        mycards.number+=4;
-            for(int i=0;i<int(mycards.number);i++){
-              printCard(mycards.list.at(i),i);
-            }
-            cout<<endl;
-
-		        cout<<"The color is changed to "<<uno_packet->color<<endl;
-
-            ret_packet=CreateReactionPacket(*uno_packet);
-	        }   
-          break;
-
+        ret_packet=CreateReactionPacket(*uno_packet);
+        break;
 
         //UNO
         case GameOp::UNO:
-          cout << this_uid << "th player say uno!" << endl;
-          ret_packet = CreateReactionPacket(*uno_packet);
-          break;
-
+        cout << this_uid << "th player say uno!" << endl;
+        ret_packet = CreateReactionPacket(*uno_packet);
+        break;
 
         //GAMEOVER
         case GameOp::GAMEOVER:
-          cout << this_uid << "th player end game";
-          ret_packet=CreateReactionPacket(*uno_packet);
-          break;
-
-        //WAIT
-        case GameOp::WAIT:
-            cout<<"It's "<<uno_packet->playing<<"s turn! Wait"<<endl;
-            cout<<"Front Card : "<<"("<<uno_packet->frontcard.color<<","<<uno_packet->frontcard.number<<")"<<endl;
-            ret_packet=CreateReactionPacket(*uno_packet);
-            break;
+        cout << this_uid << "th player end game" << endl;
+        ret_packet=CreateReactionPacket(*uno_packet);
+        break;
 
         default:
-            break;
-
-
+        break;
       }
       return ret_packet;
 }
@@ -265,10 +232,9 @@ UnoClient::goptostring(GameOp gop){
     case GameOp::INIT:      return "INIT";
     case GameOp::TURN:      return "TURN";
     case GameOp::DRAW:      return "DRAW";
-    case GameOp::PENALTY:   return "PENALTY";
     case GameOp::UNO:       return "UNO";
+    case GameOp::UNODRAW:   return "UNODRAW";
     case GameOp::GAMEOVER:  return "GAMEOVER";
-    case GameOp::WAIT:      return "WAIT";
     default:                return "Error";
   }
 }
@@ -313,59 +279,60 @@ UnoClient::HandleRead (Ptr<Socket> socket)
 }
 
 void
-UnoClient::printCard(card card, int index)
+UnoClient::printCard(card card)
 {
   switch(card.color)
   {
-      case 0:
-          cout<<"(Special, ";
-          break;
-      case 1:
-          cout<<"(Red, ";
-          break;
-      case 2:
-          cout<<"(Yellow, ";
-          break;
-      case 3:
-          cout<<"(Blue, ";
-          break;
-      case 4:
-          cout<<"(Green, ";
-          break;
-      default:
-          break;
-  }
-        
+    case SPECIAL:
+    cout<<"(Special, ";
+    break;
 
-  if(card.number>9)
-  {
-      switch(card.number)
-      {
-          case 10:
-              cout<<"Skip) ";
-              break;
-          case 11:
-              cout<<"Reverse) ";
-              break;
-          case 12:
-              cout<<"Draw Two) ";
-              break;
-          case 13:
-              cout<<"Wild) ";
-              break;
-          case 14:
-              cout<<"Wild & Draw Four) ";
-              break;
-          default:
-              break;
-      }
+    case RED:
+    cout<<"(Red, ";
+    break;
+
+    case YELLOW:
+    cout<<"(Yellow, ";
+    break;
+
+    case BLUE:
+    cout<<"(Blue, ";
+    break;
+
+    case GREEN:
+    cout<<"(Green, ";
+    break;
+
+    default:
+    break;
   }
-  else
+
+  switch(card.number)
   {
+    case SKIP:
+    cout<<"Skip) ";
+    break;
+
+    case REVERSE:
+    cout<<"Reverse) ";
+    break;
+
+    case DRAW_TWO:
+    cout<<"Draw Two) ";
+    break;
+
+    case WILD:
+    cout<<"Wild) ";
+    break;
+
+    case WILD_DRAW_FOUR:
+    cout<<"Wild & Draw Four) ";
+    break;
+
+    default:
     cout<<card.number<<") ";
-  }
-
-  return;
+    break;
+  }    
 }
 
 Ptr<Packet>
@@ -375,56 +342,47 @@ UnoClient::CreateReactionPacket(UnoPacket recv_packet)
     UnoPacket up;
     card deck_front=recv_packet.frontcard;
     
-    if(recv_packet.gameOp==GameOp::TURN){
-      bool  pass=false;
-      //penalty 여부
-      bool penalty=false;
-      int   pass_index=0;
-      //덱 위에 있는 카드가 스페셜 카드면 0번째 카드를 내려 놓는다.
-      //규칙이 정확하지 않아서 이 부분은 special 맡으신 분이 체크 부탁드립니다.
-      for(int i=0;i<int(mycards.list.size());i++)
-      {
-	      if(mycards.list.at(i).color==0)
-	      {
-		      up.passingcard=mycards.list.at(i);
-		      pass_index=i;
-		      penalty=true;
-		      break;
-	      }
-      }
+    switch (recv_packet.gameOp) {
+      case GameOp::TURN: {
+      bool pass = false;
+      int pass_index = 0;
 
-      /*if(deck_front.number>=10){
-        up.passingcard=mycards.list.at(pass_index);
-        pass_index=0;
-        pass=true;
-      }*/
-
-      //덱 위에 있는 카드가 스페셜 카드가 아니면, 손에 들고 있는 카드를 체크한다.
-      if(!penalty){
+      // If the front card is special card, check the selected color.
+      if (deck_front.color == SPECIAL) {
         for(int i=0;i<int(mycards.list.size());i++){
-          //발견시 해당 카드 내려 놓기
-          if(deck_front.color ==mycards.list.at(i).color || deck_front.number==mycards.list.at(i).number){
-            pass_index=i;
-            pass=true;
-            up.passingcard=mycards.list.at(i);
+          if(recv_packet.color == mycards.list.at(i).color || mycards.list.at(i).color == SPECIAL) {
+            pass_index = i;
+            pass = true;
+            up.passingcard = mycards.list.at(i);
+            break;
           }
         }
       }
-
+      else {
+        for(int i=0;i<int(mycards.list.size());i++){
+          if(deck_front.color == mycards.list.at(i).color || deck_front.number == mycards.list.at(i).number || mycards.list.at(i).color == SPECIAL) {
+            pass_index = i;
+            pass = true;
+            up.passingcard = mycards.list.at(i);
+            break;
+          }
+        }
+      }
+      
       if(pass){
         //내 손에서 카드 제거
         mycards.list.erase(mycards.list.begin()+pass_index);
         mycards.number=mycards.list.size();
         //UserOp는 Play
         up.userOp=UserOp::PLAY;
-	up.gameOp=GameOp::TURN;
-      }
-      else if(penalty)
-      {
-	      mycards.list.erase(mycards.list.begin()+pass_index);
-	      mycards.number=mycards.list.size();
-	      up.userOp=UserOp::PLAY;
-	      up.gameOp=GameOp::PENALTY;
+	      up.gameOp=GameOp::TURN;
+
+        if (up.passingcard.color == SPECIAL) {
+          std::random_device rd;
+          std::mt19937 gen(rd());
+          std::uniform_int_distribution<int> dis(1, 4);
+          up.color = dis(gen);
+        }
       }
       else{
         //UserOp는 Draw
@@ -436,79 +394,31 @@ UnoClient::CreateReactionPacket(UnoPacket recv_packet)
       //up.gameOp=recv_packet.gameOp;
       up.numOfCards=mycards.number;
 
-      if(penalty)
-      {
-	      cout<<"Action : PLAY, Card : "<<"("<<up.passingcard.color<<","<<up.passingcard.number<<")"<<endl;
-	      cout<<"Next player will get penalty"<<endl;
+      if(pass) {
+	      cout << "Action : PLAY, Card : ";
+        printCard(up.passingcard);
+        cout << endl;
+        if (up.passingcard.color == SPECIAL) {
+          cout << "select " << PrintColor(up.color) << endl;
+        }
       }
-      else if(pass)
-      {
-	      cout<<"Action : PLAY, Card : "<<"("<<up.passingcard.color<<","<<up.passingcard.number<<")"<<endl;
+      else {
+	      cout << "Action : Draw" << endl;
       }
-      else
-      {
-	      cout<<"Action : Draw"<<endl;
-      }
-    }
-
-    //turn이 아닐 경우 구현
-    else{
-      if(recv_packet.gameOp==GameOp::WAIT){
-        up.gameOp=GameOp::WAIT;
-        up.uid=recv_packet.uid;
-        up.seq=recv_packet.seq;
-      }
-      if(recv_packet.gameOp==GameOp::DRAW){
-        up.gameOp=GameOp::DRAW;
-        up.uid=recv_packet.uid;
-        up.seq=recv_packet.seq;
-      }
-      if(recv_packet.gameOp==GameOp::GAMEOVER){
-        up.gameOp=GameOp::GAMEOVER;
-        up.uid=recv_packet.uid;
-        up.seq=recv_packet.seq;
-      }
-      if(recv_packet.gameOp==GameOp::UNO){
-        up.gameOp=GameOp::UNO;
-        up.userOp=UserOp::UNO;
-        up.uid=recv_packet.uid;
-        up.seq=recv_packet.seq;
-      }
-      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==14){
-	      up.numOfCards=mycards.number;
-        up.userOp=UserOp::DEFAULT;
-	      up.gameOp=GameOp::TURN;
-	      up.uid=recv_packet.uid;
-	      up.seq=recv_packet.seq;
-      }
-      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==12){
-	      up.numOfCards=mycards.number;
-        up.userOp=UserOp::DEFAULT;
-	      up.gameOp=GameOp::TURN;
-	      up.uid=recv_packet.uid;
-	      up.seq=recv_packet.seq;
-      }
-      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==10){
-	      up.numOfCards=mycards.number;
-        up.gameOp=GameOp::TURN;
-	      up.uid=recv_packet.uid;
-	      up.seq=recv_packet.seq;
-      }
-      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==11){
-	      up.numOfCards=mycards.number;
-        up.userOp=UserOp::DEFAULT;
-	      up.gameOp=GameOp::DEFAULT;
-	      up.uid=recv_packet.uid;
-	      up.seq=recv_packet.seq;
-      }
-      if(recv_packet.gameOp==GameOp::PENALTY && recv_packet.passingcard.number==13){
-	      up.numOfCards=mycards.number;
-        up.userOp=UserOp::DEFAULT;
-	      up.gameOp=GameOp::DEFAULT;
-	      up.uid=recv_packet.uid;
-	      up.seq=recv_packet.seq;
+      break;
       }
 
+      case GameOp::DRAW:
+      case GameOp::UNODRAW:
+      case GameOp::UNO:
+      case GameOp::GAMEOVER:
+      up.gameOp=recv_packet.gameOp;
+      up.uid=recv_packet.uid;
+      up.seq=recv_packet.seq;
+      break;
+
+      default:
+      break;
     }
 
     p = Create<Packet> (reinterpret_cast<uint8_t*>(&up), sizeof(up));

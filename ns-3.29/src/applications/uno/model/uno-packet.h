@@ -7,19 +7,15 @@ enum class GameOp : uint32_t
     INIT,     // Game initialization.
     TURN,     // Turn start
     DRAW,     // Draw Cards
-    PENALTY,  // A user should draw cards
     UNO,      // Users have to say uno
-    GAMEOVER, // Gameover
-    WAIT,   // Wait your Turn
-    DEFAULT,
+    UNODRAW,  // UNO is too late
+    GAMEOVER  // Gameover
 };
 
 enum class UserOp : uint32_t
 {
     PLAY,     // Play a card
-    DRAW,     // Draw a card; the user cannot play a card
-    UNO,       // Say uno
-    DEFAULT,
+    DRAW      // Draw a card; the user cannot play a card
 };
 
 
