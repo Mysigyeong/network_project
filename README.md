@@ -18,7 +18,7 @@
 - 특수 카드 - 순서 건너뛰기, 순서 뒤집기, 다음 사람 카드 2장 뽑게 하기
 - 검은색으로 표시되는 2종의 와일드 카드는 각각 4장씩 존재 - 카드 색깔 바꾸기, 다음 사람 카드 4장 뽑게 하기
 
-<img src="https://user-images.githubusercontent.com/50205887/171220797-ac0bafe6-10d8-4e8a-a39a-a7a52eb858c8.png" width="800" height="800"/>
+<img src="https://user-images.githubusercontent.com/50205887/171220797-ac0bafe6-10d8-4e8a-a39a-a7a52eb858c8.png" width="400" height="400"/>
 
 ## Rule
 
