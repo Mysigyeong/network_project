@@ -135,8 +135,8 @@ for(int j=0;j<7;j++) {
 ```cpp
 case GameOp::INIT:
        {...}
-		ret_packet=packet;
-		break;
+	ret_packet=packet;
+	break;
 ```
 
 ### UnoServer::PacketRead(uint32_t uid)
@@ -145,16 +145,16 @@ case GameOp::INIT:
 
 ```cpp
 case GameOp::INIT:
-		{...}
-		ready_player++;
-		cout<<"player "<<uno_packet->uid<<" is ready"<<endl<<endl;
-		if(ready_player==unogame.player_No){
-			cout<<"All player ready to start!!"<<endl<<endl;
+	{...}
+	ready_player++;
+	cout<<"player "<<uno_packet->uid<<" is ready"<<endl<<endl;
+	if(ready_player==unogame.player_No){
+		cout<<"All player ready to start!!"<<endl<<endl;
 		{...}
 		unogame.turn++;
 		m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, unogame.playing);
-		}
-		break;
+	}
+	break;
 ```
 
 클라이언트가 보낸 TURN과 DRAW에 대해 각각에 맞는 동작을 실행한다. 
@@ -165,24 +165,24 @@ case GameOp::INIT:
 
 ```cpp
 case GameOp::TURN:
-		//user가 play 했으면,
-		if(uno_packet->userOp==UserOp::PLAY) {
-			// Shout UNO
-			if(uno_packet->numOfCards == 1){
-				/*** Implementation  ***/
-			}
-			else if (uno_packet->numOfCards == 0) {
-				/*** Implementation  ***/
-			}
-			else {
-				HandleCardEffect();
-			}
-		}
-		//user가 draw 했으면,
-		else if(uno_packet->userOp==UserOp::DRAW){
+	//user가 play 했으면,
+	if(uno_packet->userOp==UserOp::PLAY) {
+		// Shout UNO
+		if(uno_packet->numOfCards == 1){
 			/*** Implementation  ***/
 		}
-    break;
+		else if (uno_packet->numOfCards == 0) {
+			/*** Implementation  ***/
+		}
+		else {
+			HandleCardEffect();
+		}
+	}
+	//user가 draw 했으면,
+	else if(uno_packet->userOp==UserOp::DRAW){
+		/*** Implementation  ***/
+	}
+    	break;
 ```
 
 - DRAW : 플레이어가 서버의 덱으로부터 카드를 성공적으로 받아, 턴을 차례로 넘길 수 있음
@@ -212,9 +212,9 @@ case GameOp::DRAW:
 
 ```cpp
 for(uint32_t i=0;i<num;i++) {
-		Address localAddress;
-		m_socket[i]->GetSockName (localAddress);
-		m_socket[i]->Send (UnoPacketCreate(i));
+	Address localAddress;
+	m_socket[i]->GetSockName (localAddress);
+	m_socket[i]->Send (UnoPacketCreate(i));
 }
 ```
 
@@ -222,9 +222,9 @@ for(uint32_t i=0;i<num;i++) {
 
 ```cpp
 case <GameOP>:
-		cout<<"<Game Situation>"<<endl<<endl;
-		ChangingTurn();
-		m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, unogame.playing);
+	cout<<"<Game Situation>"<<endl<<endl;
+	ChangingTurn();
+	m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, unogame.playing);
 ```
 
 ## Special Cases
@@ -298,8 +298,9 @@ WILD의 경우 player가 카드의 색깔을 바꿀 수 있다. UnoServer::Packe
 case GameOp::TURN:
         //user가 play 했으면,
         if(uno_packet->userOp==UserOp::PLAY) {
-						{...}
+	    {...}
             unogame.color = uno_packet->color;
+	}
 ```
 
 ### WILD DRAW 4
