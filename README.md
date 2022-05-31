@@ -6,8 +6,7 @@
 # 소스코드 위치
 
 > ns-3.29/scatch/uno.cc
-ns-3.29/src/applications/uno/*
-> 
+> ns-3.29/src/applications/uno/*
 
 # Uno & Uno’s Rule
 
@@ -36,7 +35,7 @@ ns-3.29/src/applications/uno/*
 
 ```cpp
 Address addressList[3] = { Address(InetSocketAddress(Ipv4Address("10.1.1.1"), port)),
-													 Address(InetSocketAddress(Ipv4Address("10.1.1.2"), port)),
+                           Address(InetSocketAddress(Ipv4Address("10.1.1.2"), port)),
                            Address(InetSocketAddress(Ipv4Address("10.1.1.3"), port)) };
 ```
 
