@@ -157,11 +157,22 @@ case GameOp::INIT:
 	break;
 ```
 
+## PROCESSING TURN
+
+![그림1](https://user-images.githubusercontent.com/50205887/171222989-b878686f-93a1-4137-bd3f-8ae19ed523f4.png)
+
+1. 우노 서버에서 게임 Initialize가 이루어지면, 초기 패킷을 Uno Client에 전달한다.
+2. 클라이언트에서는 패킷 체크 후 Answer 함수를 호출한다.
+3. Answer 함수는 서버로 다시 ‘게임 준비’가 되었다는 패킷을 전송한다.
+4. 게임이 시작된다.
+5. 이 후 서버는 차례가 된 클라이언트에게 게임 상황과 관련된 정보를 전송한다.
+6. 받은 정보에 따라 클라이언트는 Answer에서 이를 처리해 패킷을 생성하고, 다시 Server로 전송한다. 
+
 클라이언트가 보낸 TURN과 DRAW에 대해 각각에 맞는 동작을 실행한다. 
 
-- TURN : 플레이어가 취하는 행동
+- TURN : 서버가 차례인 플레이어에게 게임 진행상황을 전달하고 응답을 기다림.
 
-해당 플레이어의 동작에 따라 게임을 진행한다.
+해당 플레이어는 카드를 낼 수 있으면 PLAY, 카드를 낼 수 없으면 DRAW operation을 이용하여 응답한다.
 
 ```cpp
 case GameOp::TURN:
@@ -185,7 +196,7 @@ case GameOp::TURN:
     	break;
 ```
 
-- DRAW : 플레이어가 서버의 덱으로부터 카드를 성공적으로 받아, 턴을 차례로 넘길 수 있음
+- DRAW : 서버가 플레이어에게 카드를 전달. 플레이어가 서버가 전달한 카드를 받으면 다음 플레이어에게 턴을 넘김.
 
 ```cpp
 case GameOp::DRAW:
@@ -195,45 +206,13 @@ case GameOp::DRAW:
         break;
 ```
 
-## Broadcasting
-
-![그림1](https://user-images.githubusercontent.com/50205887/171222989-b878686f-93a1-4137-bd3f-8ae19ed523f4.png)
-
-1. 우노 서버에서 게임 Initialize가 이루어지면, 초기 패킷을 Uno Client에 전달한다.
-2. 클라이언트에서는 패킷 체크 후 Answer 함수를 호출한다.
-3. Answer 함수는 서버로 다시 ‘게임 준비’가 되었다는 패킷을 전송한다.
-4. 게임이 시작된다.
-5. 이 후 클라이언트의 행동과 게임 상황과 관련된 정보가 지속적으로 Broadcasting 된다.
-6. Broadcasting 된 정보에 따라 클라이언트는 Answer에서 이를 처리해 패킷을 생성하고, 다시 Server로 전송한다. 
-
-해당 어플리케이션의 Broadcasting은 크게 두 가지로 나눌 수 있다.
-
-1. 게임 시작 전 전체에게 Ready를 묻는 Broadcasting
-
-```cpp
-for(uint32_t i=0;i<num;i++) {
-	Address localAddress;
-	m_socket[i]->GetSockName (localAddress);
-	m_socket[i]->Send (UnoPacketCreate(i));
-}
-```
-
-2. 게임 시작 후 클라이언트의 동작에 따라 게임 상황을 업데이트 한 후 다음 턴에 해당하는 유저에게 Broadcasting
-
-```cpp
-case <GameOP>:
-	cout<<"<Game Situation>"<<endl<<endl;
-	ChangingTurn();
-	m_sendEvent = Simulator::Schedule (Seconds(1.), &UnoServer::Send, this, unogame.playing);
-```
-
 ## Special Cases
 
 UnoServer::HandleCardEffect(void)에서 unogame.front.number, 즉 게임 상에서 맨위의 카드의 숫자에 따라 어떤 특수 행동을 진행할 지 결정한다. 카드의 색을 바꾸는 경우에는 UnoServer::PacketRead(Ptr<Packet> packet)에서 현재 게임 상의 color를 player가 정한 color로 바꾸어준다. 
 
 ### SKIP
 
-SKIP의 경우 다음 player를 건너뛰게 된다. 현재 게임 상의 턴 수를 1 감소함으로써 다음 player를 건너뛸 수 있다. 
+SKIP의 경우 다음 player를 건너뛰게 된다. 다음 차례로 넘기는 함수인 ChangingTurn을 두번 호출하여 다음 플레이어를 건너뛴다. 
 
 ```cpp
 case SKIP:
@@ -256,7 +235,7 @@ case REVERSE:
         break;
 ```
 
-REVERSE가 불리게 되고, 진행 방향이 반시계방향(원래는 시계방향)이라면, 게임 상의 player_NO를 감소시키는 방향으로 진행한다.
+REVERSE가 불리게 되고, 진행 방향이 반시계방향(원래는 시계방향)이라면, 게임 상의 player_No를 감소시키는 방향으로 진행한다.
 
 ```cpp
 void
@@ -279,7 +258,7 @@ UnoServer::ChangingTurn(void)
 
 ### DRAW 2
 
-DRAW 2의 경우 다음 player는 카드 2장을 받게 되고, 차례를 건너뛰게 된다. SKIP에서처럼 turn 수를 감소함으로써 차례를 건너뛰고, 다음 player에게 2장의 카드를 보낸다.
+DRAW 2의 경우 다음 player는 카드 2장을 받게 되고, 차례를 건너뛰게 된다.
 
 ```cpp
 case DRAW_TWO:
@@ -319,7 +298,7 @@ case WILD_DRAW_FOUR:
 
 ## Uno
 
-이 게임에 기본적으로 카드를 쓰는 방법은 카드를 PLAY 하는 것 밖에 없다. 그러므로 PLAY 단계에서 카드가 1장이 되면 모든 플레이어 에게 우노 패킷을 보내서, 우노를 외칠 수 있게 한다. 이 패킷을 받은 client는 우노 패킷으로 답장을 하게 되는데 이를 받은 서버가 송신자를 확인해서 우노 패널티를 처리하게 된다. (실제 게임 환경에서는 먼저 눌러야 되는 것이지만, 이 프로그램은 가상 시뮬레이션이므로 피치 못하게 이런 방법을 쓰게 됐다)
+이 게임에 기본적으로 카드를 쓰는 방법은 카드를 PLAY 하는 것 밖에 없다. 그러므로 PLAY 단계에서 카드가 1장이 되면 모든 플레이어에게 우노 패킷을 보내서, 우노를 외칠 수 있게 한다. 이 패킷을 받은 client는 우노 패킷으로 답장을 하게 되는데 이를 받은 서버가 송신자를 확인해서 우노 패널티를 처리하게 된다.
 
 매번 랜덤하게 우노를 외칠 수 있게 패킷 순서를 랜덤하게 보낸다
 
